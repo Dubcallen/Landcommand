@@ -1,3 +1,3 @@
-# LandCommand.ai — Next.js Starter
+# LandCommand.ai
 
-See app, API routes, Prisma, and deployment instructions.
+Deployed on Vercel with Next.js 14.
