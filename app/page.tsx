@@ -1,4 +1,7 @@
-import Link from "next/link";
+// before:
+// import { listings } from "@/lib/listings";
+import { listings } from "../../../lib/listings";
+
 
 export default function Home() {
   return (
