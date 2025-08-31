@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Link from "next/link";
-import { listings, Listing } from "@/lib/listings";
+// before:
+// import { listings, Listing } from "@/lib/listings";
+import { listings, type Listing } from "../../lib/listings";
+
 
 function formatUSD(n: number) {
   return n.toLocaleString(undefined, {
