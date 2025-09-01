@@ -11,17 +11,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className="relative bg-black text-white">
-        {/* Header with Logo */}
-        <header className="w-full flex items-center justify-between px-6 py-4 bg-black/80 backdrop-blur-md border-b border-neutral-800">
-          <div className="flex items-center space-x-3">
+        {/* Big Sticky Header */}
+        <header className="fixed top-0 left-0 z-50 w-full h-32 flex items-center justify-between px-10 bg-black/70 backdrop-blur-md border-b border-neutral-800">
+          <div className="flex items-center space-x-5">
             <img
               src="/sight_only.png"
               alt="LandCommand Logo"
-              className="h-12 w-12"
+              className="h-20 w-20"
             />
-            <span className="text-xl font-bold">LandCommand.ai</span>
+            <span className="text-3xl font-bold tracking-tight">
+              LandCommand.ai
+            </span>
           </div>
-          <nav className="space-x-6 text-sm font-medium">
+          <nav className="space-x-10 text-lg font-medium">
             <a href="/listings" className="hover:text-green-400">
               Listings
             </a>
@@ -34,10 +36,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </nav>
         </header>
 
-        {/* Main page content */}
-        <main>{children}</main>
+        {/* Push content down so it doesn’t overlap the header */}
+        <main className="pt-32">{children}</main>
       </body>
     </html>
   );
 }
-
