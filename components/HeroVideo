@@ -1,0 +1,50 @@
+"use client";
+
+export default function HeroVideo() {
+  return (
+    <section className="relative -mt-[var(--header-height)]">
+      <div className="relative h-[82vh] w-full overflow-hidden">
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          muted
+          loop
+          playsInline
+          autoPlay
+          poster="/hero-fallback.jpg"
+        >
+          <source src="/hero.mp4" type="video/mp4" />
+        </video>
+
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/40" />
+
+        {/* Headline */}
+        <div className="relative z-10 flex h-full items-center">
+          <div className="container-page">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-brand leading-tight">
+              <span className="brand-gradient">Precision Land Intelligence</span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg md:text-xl text-gray-200">
+              Deal flow for investors and builders. AI-driven sourcing,
+              underwriting, and marketing—at scale.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <a
+                href="/buy"
+                className="rounded-2xl px-6 py-3 text-lg bg-white text-black hover:opacity-90"
+              >
+                Explore Listings
+              </a>
+              <a
+                href="/contact"
+                className="rounded-2xl px-6 py-3 text-lg bg-transparent border border-white/80 hover:bg-white/10"
+              >
+                Partner With Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
