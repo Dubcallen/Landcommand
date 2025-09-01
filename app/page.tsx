@@ -1,25 +1,37 @@
+"use client";
+
 import React from "react";
-import { listings } from "@/lib/listings"; // or "../lib/listings" if you don't use @ alias
 
-function slugify(s: string) {
-  return String(s || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
-}
-
-export default function ListingsPage() {
-  const data = listings as any[]; // tolerate missing 'slug' in your type/data
-
+export default function HomePage() {
   return (
-    <main className="max-w-6xl mx-auto px-6 py-10 space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold">Listings</h1>
+    <main className="max-w-4xl mx-auto px-6 py-16 space-y-10">
+      <section className="space-y-3">
+        <h1 className="text-4xl font-bold">LandCommand.ai</h1>
         <p className="text-neutral-600">
-          Seeded data from <code className="font-mono">lib/listings.ts</code>.
+          AI-powered land marketing and builder partnerships.
         </p>
-      </header>
+      </section>
 
-      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-co
-
-
+      <section className="rounded-xl border p-6 space-y-2">
+        <h2 className="text-2xl font-semibold">Get started</h2>
+        <ul className="list-disc pl-6 space-y-1 text-neutral-700">
+          <li>
+            Browse{" "}
+            <a className="underline" href="/listings">
+              Listings
+            </a>
+          </li>
+          <li>
+            Try the parser on{" "}
+            <a className="underline" href="/buy">
+              /buy
+            </a>
+          </li>
+          <li>
+            Add your data in <code className="font-mono">lib/listings.ts</code>
+          </li>
+        </ul>
+      </section>
+    </main>
+  );
+}
