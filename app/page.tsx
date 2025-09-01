@@ -1,3 +1,9 @@
+import HeroVideo from "@/components/HeroVideo";
+
 export default function HomePage() {
-  return <main className="p-10">LandCommand.ai</main>;
+  return (
+    <main>
+      <HeroVideo />
+    </main>
+  );
 }
