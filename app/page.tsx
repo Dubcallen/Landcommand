@@ -1,9 +1,9 @@
-// OLD (breaks):
-// import { listings } from "@/lib/listings";
+// ❌ remove this
+// import { listings } from "../../../lib/listings";
 
-// NEW (works):
-import { listings } from "../../../lib/listings";
-import { notFound } from "next/navigation";
+// ✅ do this
+import { listings } from "@/lib/listings";
+
 
 export default function ListingPage({ params }: { params: { id: string } }) {
   const l = listings.find((x) => x.id === params.id);
