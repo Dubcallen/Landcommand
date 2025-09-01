@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "LandCommand.ai",
+  title: "Land Command",
   description: "AI-powered land marketing and builder partnerships.",
 };
 
