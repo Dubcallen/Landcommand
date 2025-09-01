@@ -1,11 +1,8 @@
 "use client";
 
-import { useState } from "react"; // <-- add this
-// import other hooks if you use them:
-// import { useEffect, useMemo } from "react";
+import { useState } from "react";
+import type { Filters } from "@/lib/types"; // or "../../lib/types" if not using alias
 
-// if you reference a Filters type, be sure it's imported too:
-import type { Filters } from "@/lib/types"; // adjust path if needed
 
 
 
