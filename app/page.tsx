@@ -16,7 +16,23 @@ export default function HomePage() {
         <h2 className="text-2xl font-semibold">Get started</h2>
         <ul className="list-disc pl-6 space-y-1 text-neutral-700">
           <li>
-            Browse <a className="underline" href="/listings">Listings</a>
+            Browse{" "}
+            <a className="underline" href="/listings">
+              Listings
+            </a>
           </li>
           <li>
-            Try the parser on <a className="underline" href="/buy">/buy<
+            Try the parser on{" "}
+            <a className="underline" href="/buy">
+              /buy
+            </a>
+          </li>
+          <li>
+            Add your data in <code className="font-mono">lib/listings.ts</code>
+          </li>
+        </ul>
+      </section>
+    </main>
+  );
+}
+
