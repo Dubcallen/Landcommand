@@ -6,14 +6,12 @@ import { Cinzel, Outfit } from "next/font/google";
 const heading = Cinzel({
   subsets: ["latin"],
   weight: ["700", "900"],
-  display: "swap",
   variable: "--font-heading",
 });
 
 const body = Outfit({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  display: "swap",
   variable: "--font-body",
 });
 
@@ -29,7 +27,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Big Sticky Header */}
         <header className="fixed top-0 left-0 z-50 w-full h-32 flex items-center justify-between px-10 bg-black/70 backdrop-blur-md border-b border-neutral-800">
           <div className="flex items-center space-x-5">
-            <img src="/sight_only.png" alt="Land Command logo" className="h-20 w-20" />
+            <img
+              src="/sight_only.png"
+              alt="Land Command logo"
+              className="h-20 w-20"
+            />
             <span className="font-heading text-4xl md:text-5xl font-bold tracking-wide">
               Land Command
             </span>
