@@ -1,45 +1,66 @@
-// ❌ remove this
-// import { listings } from "../../../lib/listings";
+"use client";
 
-// ✅ do this
-import { listings } from "@/lib/listings";
+import React, { useMemo, useState } from "react";
 
+/** Local Filters type so this page is standalone */
+type Filters = {
+  state?: string;    // e.g., "AZ"
+  county?: string;   // e.g., "Maricopa"
+  market?: string;
+  status?: "Available" | "Under Contract" | "Sold";
+  minAcreage?: number;
+  maxAcreage?: number;
+  priceMin?: number;
+  priceMax?: number;
+  tags?: string[];
+};
 
-export default function ListingPage({ params }: { params: { id: string } }) {
-  const l = listings.find((x) => x.id === params.id);
-  if (!l) return notFound();
+export default function BuyPage() {
+  const [filters, setFilters] = useState<Filters>({});
+  const [ask, setAsk] = useState("");
+
+  const parsed = useMemo(() => parseAskToFilters(ask), [ask]);
+
+  function applyParsed() {
+    setFilters((prev) => ({ ...prev, ...parsed }));
+  }
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10 grid lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 rounded-2xl border bg-white shadow-sm overflow-hidden">
-        <div className="aspect-[16/9] bg-neutral-100">
-          <img src={l.image} alt={l.title} className="h-full w-full object-cover" />
-        </div>
-        <div className="p-5">
-          <h1 className="text-2xl font-bold">{l.title}</h1>
-          <div className="text-neutral-600">
-            {l.acreage} ac • {l.county}, {l.state} • APN {l.apn}
-          </div>
-          <div className="flex flex-wrap gap-2 mt-3">
-            {l.features.map((f) => (
-              <span key={f} className="inline-block border rounded-full px-2 py-0.5 text-xs">
-                {f}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-      <aside className="rounded-2xl border bg-white shadow-sm p-6 space-y-4">
-        <div className="text-3xl font-extrabold">
-          ${Intl.NumberFormat().format(l.price)}
-        </div>
-        <a href="/#packages" className="w-full inline-flex justify-center rounded-xl px-4 py-2 bg-black text-white">
-          Market a Similar Property
-        </a>
-        <p className="text-xs text-neutral-500">
-          Info deemed reliable but not guaranteed. Verify with applicable county & agencies.
+    <div className="max-w-3xl mx-auto px-6 py-10 space-y-8">
+      <header className="space-y-2">
+        <h1 className="text-3xl font-bold">Buy Land</h1>
+        <p className="text-sm text-neutral-600">
+          Use the quick parser or set filters manually. This starter is self-contained so it won’t break your build.
         </p>
-      </aside>
-    </section>
-  );
-}
+      </header>
+
+      {/* Ask Land AI */}
+      <section className="space-y-3">
+        <label className="block text-sm font-medium">Ask Land AI</label>
+        <textarea
+          value={ask}
+          onChange={(e) => setAsk(e.target.value)}
+          placeholder="ex: 40 to 80 acres in Maricopa County AZ under $200k, available"
+          className="w-full rounded-lg border px-3 py-2 min-h-[110px]"
+        />
+        <div className="text-sm text-neutral-700">
+          <strong>Parsed preview: </strong>
+          <span className="text-xs break-all">
+            {JSON.stringify(parsed || {}, null, 0)}
+          </span>
+        </div>
+        <button
+          onClick={applyParsed}
+          className="rounded-lg border px-4 py-2 hover:bg-neutral-50"
+        >
+          Apply Parsed Filters
+        </button>
+      </section>
+
+      {/* Manual filters */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold">Filters</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="State (2-letter)"
+            valu
