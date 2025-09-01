@@ -1,8 +1,12 @@
 "use client";
 
-// before:
-// import { listings, Listing } from "@/lib/listings";
-import { listings, type Listing } from "../../lib/listings";
+import { useState } from "react"; // <-- add this
+// import other hooks if you use them:
+// import { useEffect, useMemo } from "react";
+
+// if you reference a Filters type, be sure it's imported too:
+import type { Filters } from "@/lib/types"; // adjust path if needed
+
 
 
 function formatUSD(n: number) {
