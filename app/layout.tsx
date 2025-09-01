@@ -1,12 +1,12 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { ReactNode } from "react";
-import { Manrope } from "next/font/google";
+import { Cinzel } from "next/font/google";
 
-// Premium-looking brand font (bold, modern)
-const brand = Manrope({
+// Premium Roman-inspired font
+const brand = Cinzel({
   subsets: ["latin"],
-  weight: ["700", "800"], // strong weights for the logo text
+  weight: ["700", "900"],
 });
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className="relative bg-black text-white">
-        {/* Big Sticky Header (content scrolls under) */}
+        {/* Big Sticky Header */}
         <header className="fixed top-0 left-0 z-50 w-full h-32 flex items-center justify-between px-10 bg-black/70 backdrop-blur-md border-b border-neutral-800">
           <div className="flex items-center space-x-5">
             <img
@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               className="h-20 w-20"
             />
             <span
-              className={`${brand.className} text-3xl md:text-4xl font-extrabold tracking-tight`}
+              className={`${brand.className} text-4xl md:text-5xl font-bold tracking-wide`}
             >
               Land Command
             </span>
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </nav>
         </header>
 
-        {/* Push page content below the tall header */}
+        {/* Push content down below the tall header */}
         <main className="pt-32">{children}</main>
       </body>
     </html>
