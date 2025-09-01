@@ -14,17 +14,7 @@ function formatUSD(n: number) {
   });
 }
 
-type Filters = {
-  q?: string;
-  state?: string;
-  county?: string;
-  type?: Listing["type"] | "";
-  priceMin?: number;
-  priceMax?: number;
-  acresMin?: number;
-  acresMax?: number;
-  feature?: string;
-};
+
 
 export default function BuyPage() {
   const [filters, setFilters] = useState<Filters>({});
