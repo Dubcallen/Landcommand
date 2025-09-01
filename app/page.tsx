@@ -1,25 +1,57 @@
-"use client";
-
 import React from "react";
+import { listings } from "@/lib/listings"; // or "../lib/listings" if you're not using @ alias
 
-export default function HomePage() {
+function slugify(s: string) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
+
+export default function ListingsPage() {
+  const data = listings as any[]; // loosen typing until your Listing includes 'slug'
+
   return (
-    <main className="max-w-4xl mx-auto px-6 py-16 space-y-10">
-      <section className="space-y-3">
-        <h1 className="text-4xl font-bold">LandCommand.ai</h1>
+    <main className="max-w-6xl mx-auto px-6 py-10 space-y-8">
+      <header>
+        <h1 className="text-3xl font-bold">Listings</h1>
         <p className="text-neutral-600">
-          AI-powered land marketing and builder partnerships. This is a minimal home page to ensure the app builds cleanly.
+          Seeded data from <code className="font-mono">lib/listings.ts</code>.
         </p>
-      </section>
+      </header>
 
-      <section className="rounded-xl border p-6">
-        <h2 className="text-2xl font-semibold mb-2">Get started</h2>
-        <ul className="list-disc pl-6 space-y-1 text-neutral-700">
-          <li>Go to <code className="font-mono">/buy</code> to try the filter/parser UI.</li>
-          <li>Wire listings data later via <code className="font-mono">/lib/listings.ts</code> or a CMS.</li>
-          <li>Customize the navbar/footer and add routes like <code className="font-mono">/listings</code>, <code className="font-mono">/about</code>, <code className="font-mono">/contact</code>.</li>
-        </ul>
-      </section>
+      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {data.map((l, i) => {
+          const safeSlug = l?.slug ?? slugify(l?.title ?? `listing-${i}`);
+          return (
+            <li key={safeSlug} className="border rounded-xl p-4">
+              <div className="text-sm text-neutral-500">
+                {l?.market ?? ""}
+                {l?.county ? ` • ${l.county} County` : ""}
+              </div>
+              <h2 className="text-xl font-semibold">
+                {l?.title ?? "Untitled Listing"}
+              </h2>
+              <div className="text-sm">
+                {(l?.acreage ?? "—")} acres • {l?.status ?? "Available"}
+              </div>
+              {typeof l?.price === "number" ? (
+                <div className="font-medium mt-1">
+                  ${l.price.toLocaleString()}
+                </div>
+              ) : (
+                <div className="font-medium mt-1">Call for price</div>
+              )}
+              <a
+                href={`/listings/${safeSlug}`}
+                className="inline-block mt-3 text-sm underline"
+              >
+                View details
+              </a>
+            </li>
+          );
+        })}
+      </ul>
     </main>
   );
 }
