@@ -13,7 +13,24 @@ export default function HomePage() {
           overflow: "hidden",
         }}
       >
+        {/* MOBILE: show the image */}
+        <img
+          src="/sight_only.png?v=2" // bump v=2 to bust CDN/browser cache
+          alt="LandCommand hero"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+          className="md:hidden"
+        />
+
+        {/* DESKTOP/TABLET: show the video */}
         <video
+          className="hidden md:block"
           style={{
             position: "absolute",
             inset: 0,
@@ -25,9 +42,9 @@ export default function HomePage() {
           loop
           playsInline
           autoPlay
-          poster="/sight_only.png" // change to /sight-only.png if that’s your actual file
+          poster="/sight_only.png?v=2"
         >
-          <source src="/hero.mp4?v=1" type="video/mp4" />
+          <source src="/hero.mp4?v=2" type="video/mp4" />
         </video>
 
         {/* dark overlay for readability */}
