@@ -2,13 +2,10 @@
 
 import React, { useMemo, useState } from "react";
 
-// From app/buy → app/components
 import AiSearch from "../components/AiSearch";
 import HeroVideo from "../components/HeroVideo";
 
-// From app/buy → root/lib
-import { getAllListings } from "../../lib/listings";
-import type { Listing } from "../../lib/types";
+import { getAllListings, type Listing } from "../../lib/listings";
 
 type Filters = {
   state?: string;
@@ -27,7 +24,7 @@ export default function BuyPage() {
 
   const listings: Listing[] = useMemo(() => {
     try {
-      return getAllListings(); // if async, convert this page to a Server Component
+      return getAllListings();
     } catch {
       return [];
     }
@@ -41,7 +38,6 @@ export default function BuyPage() {
 
       <section className="space-y-4">
         <AiSearch />
-        {/* TODO: wire filters into AiSearch and apply to listings */}
       </section>
 
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
