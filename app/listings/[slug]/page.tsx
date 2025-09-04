@@ -1,72 +1,59 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import { listings } from "@/lib/listings"; // or "../lib/listings" if you’re not using @ alias
+import { getListingBySlug, type Listing } from "../../../lib/listings";
 
-function slugify(s: string) {
-  return String(s || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
-}
+type PageProps = { params: { slug: string } };
 
-export default function ListingDetail({ params }: { params: { slug: string } }) {
-  const data = listings as any[]; // keep loose until your Listing type includes 'slug'
-  const listing =
-    data.find((l) => l?.slug === params.slug) ??
-    data.find((l) => slugify(l?.title) === params.slug);
-
-  if (!listing) return notFound();
+export default function ListingDetailPage({ params }: PageProps) {
+  const l: Listing | undefined = getListingBySlug(params.slug);
+  if (!l) return notFound();
 
   return (
-    <main className="max-w-4xl mx-auto px-6 py-10 space-y-6">
-      <a href="/listings" className="text-sm underline">
-        ← Back to listings
-      </a>
+    <main className="mx-auto max-w-5xl px-4 py-10 space-y-6">
+      <header>
+        <h1 className="text-2xl font-bold">{l.title}</h1>
+        <p className="text-neutral-600">
+          {l.acreage.toLocaleString()} acres • {l.state}
+          {l.county ? `, ${l.county}` : ""} {l.market ? `• ${l.market}` : ""}
+        </p>
+      </header>
 
-      <h1 className="text-3xl font-bold">
-        {listing.title ?? "Untitled Listing"}
-      </h1>
+      <section className="grid gap-4">
+        {l.heroPhoto && (
+          // Using plain <img> so this compiles even without next/image config
+          <img
+            src={l.heroPhoto}
+            alt={l.title}
+            className="w-full rounded-2xl border"
+          />
+        )}
 
-      <div className="text-neutral-600">
-        {listing.market ?? ""}
-        {listing.county ? ` • ${listing.county} County` : ""}
-        {listing.acreage ? ` • ${listing.acreage} acres` : ""}
-        {listing.status ? ` • ${listing.status}` : ""}
-      </div>
-
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-4">
-          <p>{listing.description ?? "No description provided."}</p>
-          {Array.isArray(listing.highlights) && listing.highlights.length > 0 ? (
-            <ul className="list-disc pl-6">
-              {listing.highlights.map((h: string, i: number) => (
-                <li key={i}>{h}</li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-
-        <aside className="border rounded-xl p-4 space-y-2">
-          <div className="text-sm text-neutral-500">Price</div>
-          <div className="text-xl font-semibold">
-            {typeof listing.price === "number"
-              ? `$${listing.price.toLocaleString()}`
-              : "Call"}
+        {l.photos?.length ? (
+          <div className="grid grid-cols-2 gap-4">
+            {l.photos.slice(0, 4).map((p, i) => (
+              <img key={i} src={p} alt="" className="w-full rounded-xl border" />
+            ))}
           </div>
+        ) : null}
+      </section>
 
-          {listing.broker?.name && (
-            <div className="pt-4 text-sm">
-              <div className="font-medium">Broker</div>
-              <div>{listing.broker.name}</div>
-              {listing.broker.email && (
-                <a className="underline" href={`mailto:${listing.broker.email}`}>
-                  {listing.broker.email}
-                </a>
-              )}
-              {listing.broker.phone && <div>{listing.broker.phone}</div>}
-            </div>
-          )}
-        </aside>
+      <section className="grid gap-2">
+        {l.description && <p className="text-neutral-700">{l.description}</p>}
+        <ul className="grid grid-cols-2 gap-x-8 text-sm">
+          <li>
+            <span className="font-medium">Status:</span> {l.status}
+          </li>
+          <li>
+            <span className="font-medium">APN:</span> {l.apn ?? "—"}
+          </li>
+          <li>
+            <span className="font-medium">Zoning:</span> {l.zoning ?? "—"}
+          </li>
+          <li>
+            <span className="font-medium">Road Access:</span>{" "}
+            {l.roadAccess ?? "—"}
+          </li>
+        </ul>
       </section>
     </main>
   );
