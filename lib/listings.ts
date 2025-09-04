@@ -1,6 +1,6 @@
 // lib/listings.ts
 
-// --- Types (you can move these out later if needed) ---
+// --- Types ---
 export type ListingStatus = "Available" | "Under Contract" | "Sold";
 
 export type Listing = {
@@ -29,7 +29,7 @@ export type Listing = {
   updatedAt?: string;
 };
 
-// --- Sample data (replace with real listings later) ---
+// --- Sample data ---
 const listings: Listing[] = [
   {
     id: "az-mar-001",
@@ -85,7 +85,7 @@ const listings: Listing[] = [
   }
 ];
 
-// --- Functions exported for your pages ---
+// --- Functions ---
 export function getAllListings(): Listing[] {
   return listings;
 }
