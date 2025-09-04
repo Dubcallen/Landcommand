@@ -2,17 +2,17 @@
 
 import React, { useMemo, useState } from "react";
 
-// Make sure we import from *app/components* (not the root components folder)
-import AiSearch from "./components/AiSearch";
-import HeroVideo from "./components/HeroVideo";
+// From app/buy → app/components
+import AiSearch from "../components/AiSearch";
+import HeroVideo from "../components/HeroVideo";
 
-import { getAllListings } from "../lib/listings";
-import type { Listing } from "../lib/types";
+// From app/buy → root/lib
+import { getAllListings } from "../../lib/listings";
+import type { Listing } from "../../lib/types";
 
-/** Local Filters type so this page is standalone */
 type Filters = {
-  state?: string; // e.g., "AZ"
-  county?: string; // e.g., "Maricopa"
+  state?: string;
+  county?: string;
   market?: string;
   status?: "Available" | "Under Contract" | "Sold";
   minAcreage?: number;
@@ -22,13 +22,12 @@ type Filters = {
   tags?: string[];
 };
 
-export default function HomePage() {
+export default function BuyPage() {
   const [filters, setFilters] = useState<Filters>({});
 
-  // Replace this with a proper async fetch if getAllListings is async
   const listings: Listing[] = useMemo(() => {
     try {
-      return getAllListings(); // if async, adjust to Server Component
+      return getAllListings(); // if async, convert this page to a Server Component
     } catch {
       return [];
     }
@@ -42,7 +41,7 @@ export default function HomePage() {
 
       <section className="space-y-4">
         <AiSearch />
-        {/* TODO: wire filters into your search component and apply to listings */}
+        {/* TODO: wire filters into AiSearch and apply to listings */}
       </section>
 
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -58,4 +57,3 @@ export default function HomePage() {
     </main>
   );
 }
-
