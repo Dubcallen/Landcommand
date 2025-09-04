@@ -1,53 +1,30 @@
-"use client";
+import React from "react";
+import Link from "next/link";
+import { getAllListings, type Listing } from "../../lib/listings";
 
-import React, { useMemo, useState } from "react";
-
-import AiSearch from "./components/AiSearch";
-import HeroVideo from "./components/HeroVideo";
-
-import { getAllListings, type Listing } from "../lib/listings";
-
-type Filters = {
-  state?: string;
-  county?: string;
-  market?: string;
-  status?: "Available" | "Under Contract" | "Sold";
-  minAcreage?: number;
-  maxAcreage?: number;
-  priceMin?: number;
-  priceMax?: number;
-  tags?: string[];
-};
-
-export default function HomePage() {
-  const [filters, setFilters] = useState<Filters>({});
-
-  const listings: Listing[] = useMemo(() => {
-    try {
-      return getAllListings();
-    } catch {
-      return [];
-    }
-  }, []);
+export default function ListingsIndexPage() {
+  // getAllListings is sync in our setup
+  const listings: Listing[] = getAllListings();
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 space-y-10">
-      <section className="rounded-2xl overflow-hidden">
-        <HeroVideo />
-      </section>
-
-      <section className="space-y-4">
-        <AiSearch />
-      </section>
+    <main className="mx-auto max-w-7xl px-4 py-10">
+      <h1 className="text-2xl font-bold mb-6">Listings</h1>
 
       <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {listings.map((l) => (
-          <article key={l.id} className="rounded-2xl border p-4">
+          <Link
+            key={l.id}
+            href={`/listings/${l.slug}`}
+            className="block rounded-2xl border p-4 hover:shadow-sm transition"
+          >
             <h3 className="text-lg font-semibold">{l.title}</h3>
             <p className="text-sm text-neutral-600 mt-1">
               {l.acreage.toLocaleString()} acres • {l.state}
             </p>
-          </article>
+            {l.market && (
+              <p className="text-sm text-neutral-500">{l.market}</p>
+            )}
+          </Link>
         ))}
       </section>
     </main>
