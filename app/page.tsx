@@ -2,17 +2,14 @@
 
 import React, { useMemo, useState } from "react";
 
-// From app/ → app/components
 import AiSearch from "./components/AiSearch";
 import HeroVideo from "./components/HeroVideo";
 
-// From app/ → root/lib
-import { getAllListings } from "../lib/listings";
-import type { Listing } from "../lib/types";
+import { getAllListings, type Listing } from "../lib/listings";
 
 type Filters = {
-  state?: string; // e.g., "AZ"
-  county?: string; // e.g., "Maricopa"
+  state?: string;
+  county?: string;
   market?: string;
   status?: "Available" | "Under Contract" | "Sold";
   minAcreage?: number;
@@ -27,7 +24,7 @@ export default function HomePage() {
 
   const listings: Listing[] = useMemo(() => {
     try {
-      return getAllListings(); // if async, convert this page to a Server Component
+      return getAllListings();
     } catch {
       return [];
     }
