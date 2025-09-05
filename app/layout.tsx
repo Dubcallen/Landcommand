@@ -1,50 +1,40 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import { ReactNode } from "react";
-import { Cinzel, Outfit } from "next/font/google";
+import "@/styles/globals.css";
+import type { ReactNode } from "react";
+import { Inter, Playfair_Display } from "next/font/google";
 
-const heading = Cinzel({
-  subsets: ["latin"],
-  weight: ["700", "900"],
-  variable: "--font-heading",
-});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-display"] });
 
-const body = Outfit({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-body",
-});
-
-export const metadata: Metadata = {
-  title: "Land Command",
-  description: "AI-powered land marketing and builder partnerships.",
+export const metadata = {
+  title: "LandCommand.ai",
+  description: "Premium land listings. AI-powered discovery.",
+  icons: { icon: "/favicon.ico", shortcut: "/favicon.ico", apple: "/favicon.ico" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${heading.variable} ${body.variable}`}>
-      <body className="relative bg-black text-white font-body">
-        {/* Big Sticky Header */}
-        <header className="fixed top-0 left-0 z-50 w-full h-32 flex items-center justify-between px-10 bg-black/70 backdrop-blur-md border-b border-neutral-800">
-          <div className="flex items-center space-x-5">
-            <img
-              src="/sight_only.png"
-              alt="Land Command logo"
-              className="h-20 w-20"
-            />
-            <span className="font-heading text-4xl md:text-5xl font-bold tracking-wide">
-              Land Command
-            </span>
+    <html lang="en">
+      <body className={`${inter.variable} ${playfair.variable} min-h-dvh bg-white text-neutral-900 antialiased`}>
+        <header className="border-b">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+            <a href="/" className="flex items-center gap-2">
+              {/* swap to your header logo asset */}
+              <img src="/branding/logo.png" alt="LandCommand.ai" className="h-8 w-auto" />
+            </a>
+            <nav className="flex gap-6 text-sm">
+              <a href="/listings" className="hover:opacity-80">Listings</a>
+              <a href="/buy" className="hover:opacity-80">Buy</a>
+              <a href="/about" className="hover:opacity-80">About</a>
+              <a href="/contact" className="hover:opacity-80">Contact</a>
+            </nav>
           </div>
-          <nav className="hidden md:flex items-center space-x-10 text-lg font-medium">
-            <a href="/listings" className="hover:text-green-400">Listings</a>
-            <a href="/buy" className="hover:text-green-400">Ask Land AI</a>
-            <a href="/contact" className="hover:text-green-400">Contact</a>
-          </nav>
         </header>
-
-        {/* Push content below tall header */}
-        <main className="pt-32">{children}</main>
+        {children}
+        <footer className="mt-16 border-t">
+          <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-neutral-600">
+            © {new Date().getFullYear()} LandCommand.ai — All rights reserved.
+          </div>
+        </footer>
       </body>
     </html>
   );
