@@ -10,9 +10,9 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          charcoal: "#1A1A1A",
-          green: "#0B3D2E",
-          ivory: "#FAF9F6",
+          charcoal: "#1B1B1B", // Dark background
+          green: "#2F4F4F",   // Forest accent
+          linen: "#EFECE0",   // Warm text / highlight
         },
       },
       fontFamily: {
