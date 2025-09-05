@@ -2,15 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Background / base */
+/* Base colors */
 html, body {
-  background-color: theme("colors.brand.ivory");
-  color: theme("colors.brand.charcoal");
+  background-color: theme("colors.brand.charcoal");
+  color: theme("colors.brand.linen");
   @apply antialiased;
 }
 
 /* Links */
-a { @apply text-brand-green hover:opacity-80; }
+a {
+  @apply text-brand-green hover:opacity-80;
+}
 
 /* Buttons */
 .btn {
@@ -20,10 +22,10 @@ a { @apply text-brand-green hover:opacity-80; }
   @apply bg-brand-green text-white hover:opacity-90;
 }
 .btn--outline {
-  @apply border border-brand-charcoal text-brand-charcoal hover:bg-brand-charcoal hover:text-white;
+  @apply border border-brand-linen text-brand-linen hover:bg-brand-linen hover:text-brand-charcoal;
 }
 
 /* Cards */
 .card {
-  @apply rounded-2xl border border-brand-charcoal/10 bg-white shadow-sm;
+  @apply rounded-2xl border border-brand-linen/20 bg-[#2A2A2A] shadow-sm text-brand-linen;
 }
