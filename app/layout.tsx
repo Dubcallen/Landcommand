@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Inter, Playfair_Display } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-display"] });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-display" });
 
 export const metadata = {
   title: "LandCommand.ai",
@@ -18,7 +18,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <header className="border-b">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
             <a href="/" className="flex items-center gap-2">
-              {/* swap to your header logo asset */}
               <img src="/branding/logo.png" alt="LandCommand.ai" className="h-8 w-auto" />
             </a>
             <nav className="flex gap-6 text-sm">
