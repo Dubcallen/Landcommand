@@ -1,29 +1,19 @@
-import "@/styles/globals.css";
-import type { ReactNode } from "react";
-import { Inter, Playfair_Display } from "next/font/google";
-import Nav from "./components/nav";
+// app/layout.tsx
+import "./globals.css";
+import type { Metadata } from "next";
+import Nav from "@/app/components/nav";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-display" });
-
-export const metadata = {
+export const metadata: Metadata = {
   title: "LandCommand.ai",
-  description: "Premium land listings. AI-powered discovery.",
-  icons: { icon: "/favicon.ico", shortcut: "/favicon.ico", apple: "/favicon.ico" },
+  description: "Middle Tennessee land, farm, equestrian, estate specialists.",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} min-h-dvh bg-brand-charcoal text-brand-linen`}>
-        {/* Overlaid header */}
+      <body className="min-h-screen bg-[#1B1B1B] text-[#EFECE0]">
         <Nav />
         {children}
-        <footer className="mt-16 border-t border-white/10">
-          <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-white/70">
-            © {new Date().getFullYear()} LandCommand.ai — All rights reserved.
-          </div>
-        </footer>
       </body>
     </html>
   );
