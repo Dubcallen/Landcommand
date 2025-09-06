@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import type { ReactNode } from "react";
 import { Inter, Playfair_Display } from "next/font/google";
-import Nav from "@/app/components/Nav";
+import Nav from "./components/Nav";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-display" });
