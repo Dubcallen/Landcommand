@@ -3,79 +3,71 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { ChevronDown, ChevronRight } from "lucide-react";
-
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
 
 /**
- * LandCommand Nav (Full)
+ * Nav (no external deps)
  * - Centered large logo
- * - Left + right menus with hover dropdowns
- * - Pronounced delayed scroll lag + vertical drag effect
- * - Top-right hamburger opening a side drawer (not full takeover)
+ * - Left + right hover dropdown menus
+ * - Pronounced delayed scroll lag + vertical drag (requestAnimationFrame + lerp)
+ * - Top-right hamburger opening a right side drawer (pure React + CSS)
  */
 
-// Animated Hamburger Icon (3 lines morph into X)
-function AnimatedHamburger({ open }: { open: boolean }) {
-  return (
-    <motion.svg
-      width={24}
-      height={24}
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
-      role="img"
-      className="block"
-    >
-      <motion.line
-        x1="4" y1="7" x2="20" y2="7"
-        stroke="currentColor" strokeWidth={2} strokeLinecap="round"
-        initial={false}
-        animate={open ? { y1: 12, y2: 12, rotate: 45, x1: 6, x2: 18 } : { y1: 7, y2: 7, rotate: 0, x1: 4, x2: 20 }}
-        transition={{ type: "spring", stiffness: 500, damping: 40 }}
-        style={{ originX: 12, originY: 12 }}
-      />
-      <motion.line
-        x1="4" y1="12" x2="20" y2="12"
-        stroke="currentColor" strokeWidth={2} strokeLinecap="round"
-        initial={false}
-        animate={open ? { opacity: 0 } : { opacity: 1 }}
-        transition={{ duration: 0.15 }}
-      />
-      <motion.line
-        x1="4" y1="17" x2="20" y2="17"
-        stroke="currentColor" strokeWidth={2} strokeLinecap="round"
-        initial={false}
-        animate={open ? { y1: 12, y2: 12, rotate: -45, x1: 6, x2: 18 } : { y1: 17, y2: 17, rotate: 0, x1: 4, x2: 20 }}
-        transition={{ type: "spring", stiffness: 500, damping: 40 }}
-        style={{ originX: 12, originY: 12 }}
-      />
-    </motion.svg>
-  );
+// --- Small helpers for scroll lag ---
+function useScrollLag() {
+  const [lag, setLag] = React.useState(0);
+  const currentRef = React.useRef(0);
+  const targetRef = React.useRef(0);
+  const rafRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    const onScroll = () => {
+      targetRef.current = Math.min(window.scrollY, 600); // clamp for mapping
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    const tick = () => {
+      // lerp current toward target
+      const c = currentRef.current;
+      const t = targetRef.current;
+      const next = c + (t - c) * 0.12; // adjust factor for more/less drag
+      currentRef.current = next;
+      // map 0..600 -> 0..40
+      const translate = (next / 600) * 40; // px
+      setLag(translate);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  // backdrop opacity map: 0..600 -> 0.1..0.35
+  const opacity = React.useMemo(() => {
+    const y = Math.min(currentRef.current, 600);
+    return 0.1 + (y / 600) * (0.35 - 0.1);
+  }, [lag]);
+
+  return { lag, opacity };
 }
 
 export default function Nav() {
-  // --- Scroll lag / vertical drag effect ---
-  const { scrollY } = useScroll();
-  const lagY = useSpring(scrollY, { stiffness: 60, damping: 18, mass: 0.8 });
-  const translateY = useTransform(lagY, [0, 600], [0, -40]);
-  const backdropOpacity = useTransform(lagY, [0, 200, 600], [0.1, 0.25, 0.35]);
-
+  const { lag, opacity } = useScrollLag();
   const [open, setOpen] = React.useState(false);
 
   return (
-    <motion.nav
-      style={{ y: translateY, background: "rgba(12,12,12,0.35)", backdropFilter: "saturate(140%) blur(8px)" }}
+    <nav
+      style={{ transform: `translateY(${-lag}px)`, background: "rgba(12,12,12,0.35)" as const, backdropFilter: "saturate(140%) blur(8px)" }}
       className="fixed inset-x-0 top-0 z-50 border-b border-white/10"
     >
       {/* translucent underlay intensifies with scroll */}
-      <motion.div style={{ opacity: backdropOpacity }} className="absolute inset-0 bg-black" />
+      <div style={{ opacity }} className="pointer-events-none absolute inset-0 bg-black" />
 
-      <div className="relative mx-auto grid h-[76px] max-w-[1120px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto grid h-[76px] max-w-[1120px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-5 lg:px-6">
         {/* Left menu (desktop) */}
-        <div className="hidden items-center justify-end md:flex pr-6">
+        <div className="hidden items-center justify-end pr-6 md:flex">
           <NavMenu
             items={[
               {
@@ -106,10 +98,10 @@ export default function Nav() {
             <Image
               src="/logo.svg"
               alt="LandCommand"
-              width={180}
-              height={56}
+              width={160}
+              height={54}
               priority
-              className="h-14 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
+              className="h-12 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
             />
           </Link>
         </div>
@@ -133,36 +125,26 @@ export default function Nav() {
             />
           </div>
 
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Open menu"
-                className="ml-1 h-10 w-10 rounded-xl p-0 bg-white/10 hover:bg-white/15 ring-1 ring-white/15"
-              >
-                <AnimatedHamburger open={open} />
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="w-[320px] sm:w-[380px] p-0 border-l border-white/10 bg-black/70 backdrop-blur-md"
-            >
-              <SheetHeader className="px-4 py-3 border-b border-white/10">
-                <SheetTitle className="flex items-center gap-2">
-                  <Image src="/logo.svg" alt="LandCommand" width={120} height={36} className="h-9 w-auto" />
-                </SheetTitle>
-              </SheetHeader>
-              <MobileNav onNavigate={() => setOpen(false)} />
-            </SheetContent>
-          </Sheet>
+          {/* Mobile hamburger */}
+          <button
+            aria-label="Open menu"
+            onClick={() => setOpen(true)}
+            className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 transition hover:bg-white/15"
+          >
+            <Hamburger open={open} />
+          </button>
         </div>
       </div>
-    </motion.nav>
+
+      {/* Side Drawer (no shadcn) */}
+      <Drawer open={open} onClose={() => setOpen(false)}>
+        <MobileNav onNavigate={() => setOpen(false)} />
+      </Drawer>
+    </nav>
   );
 }
 
-// --- Desktop Menu with hover dropdowns ---
+// --- Desktop Menu with hover dropdowns (no external icons) ---
 function NavMenu({
   items,
 }: {
@@ -174,22 +156,19 @@ function NavMenu({
         <div key={item.label} className="group relative">
           <Link
             href={item.href}
-            className="inline-flex items-center gap-1 text-[12px] font-semibold tracking-[0.32em] uppercase text-white/90 transition-colors hover:text-white hover:underline underline-offset-[6px] decoration-white/80"
+            className="inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-[0.32em] text-white/90 transition-colors hover:text-white hover:underline underline-offset-[6px] decoration-white/80"
           >
             <span>{item.label}</span>
             {item.children?.length ? (
-              <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
+              <svg viewBox="0 0 24 24" className="h-4 w-4 transition-transform group-hover:rotate-180" aria-hidden>
+                <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             ) : null}
           </Link>
 
           {item.children?.length ? (
-            <motion.div
-              initial={{ opacity: 0, y: -6, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ type: "spring", stiffness: 220, damping: 20 }}
-              className="pointer-events-none absolute left-1/2 top-8 z-50 w-56 -translate-x-1/2 opacity-0 shadow-2xl ring-1 ring-white/10 drop-shadow-xl group-hover:pointer-events-auto group-hover:opacity-100"
-            >
-              <div className="rounded-2xl border border-white/10 bg-black/70 backdrop-blur-md p-2">
+            <div className="pointer-events-none absolute left-1/2 top-8 z-50 w-56 -translate-x-1/2 opacity-0 shadow-2xl ring-1 ring-white/10 drop-shadow-xl transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
+              <div className="rounded-2xl border border-white/10 bg-black/70 p-2 backdrop-blur-md">
                 {item.children.map((child) => (
                   <Link
                     key={child.label}
@@ -197,11 +176,13 @@ function NavMenu({
                     className="flex items-center justify-between rounded-xl px-3 py-2 text-sm text-white/90 transition hover:bg-white/5 hover:text-white"
                   >
                     {child.label}
-                    <ChevronRight className="h-4 w-4 opacity:60" />
+                    <svg viewBox="0 0 24 24" className="h-4 w-4 opacity-60" aria-hidden>
+                      <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </Link>
                 ))}
               </div>
-            </motion.div>
+            </div>
           ) : null}
         </div>
       ))}
@@ -209,39 +190,85 @@ function NavMenu({
   );
 }
 
+// --- Hamburger (3 bars -> X) ---
+function Hamburger({ open }: { open: boolean }) {
+  return (
+    <div className="relative h-5 w-6">
+      <span
+        className={`absolute left-0 top-0 block h-0.5 w-6 origin-center rounded bg-white transition-transform duration-300 ${
+          open ? "translate-y-[10px] rotate-45" : "translate-y-0 rotate-0"
+        }`}
+      />
+      <span
+        className={`absolute left-0 top-1/2 block h-0.5 w-6 -translate-y-1/2 origin-center rounded bg-white transition-opacity duration-200 ${
+          open ? "opacity-0" : "opacity-100"
+        }`}
+      />
+      <span
+        className={`absolute left-0 bottom-0 block h-0.5 w-6 origin-center rounded bg-white transition-transform duration-300 ${
+          open ? "-translate-y-[10px] -rotate-45" : "translate-y-0 rotate-0"
+        }`}
+      />
+    </div>
+  );
+}
+
+// --- No-deps Drawer ---
+function Drawer({ open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode }) {
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        onClick={onClose}
+      />
+
+      {/* Panel */}
+      <aside
+        className={`fixed right-0 top-0 z-[61] h-dvh w-[320px] sm:w-[380px] border-l border-white/10 bg-black/70 p-0 text-white backdrop-blur-md transition-transform ${
+          open ? "translate-x-0" : "translate-x-full"
+        }`}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="px-4 py-3 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <Image src="/logo.svg" alt="LandCommand" width={120} height={36} className="h-9 w-auto" />
+            <button onClick={onClose} aria-label="Close menu" className="ml-auto rounded-lg px-3 py-1 text-sm text-white/80 hover:bg-white/10">Close</button>
+          </div>
+        </div>
+        <div className="max-h-[calc(100dvh-60px)] overflow-y-auto">{children}</div>
+      </aside>
+    </>
+  );
+}
+
 // --- Mobile Drawer Content ---
 function MobileNav({ onNavigate }: { onNavigate?: () => void }) {
   const groups = [
     {
-      title: "Land",
+      title: "Properties",
       items: [
-        { label: "All Land", href: "/land" },
-        { label: "Ranches", href: "/land/ranch" },
-        { label: "Large Acreage", href: "/land/acreage" },
+        { label: "Active Listings", href: "/properties/active" },
+        { label: "Private Listings", href: "/properties/private" },
+        { label: "Notable Sales", href: "/properties/notable" },
       ],
     },
     {
-      title: "Farm",
+      title: "About",
       items: [
-        { label: "Irrigated", href: "/farm/irrigated" },
-        { label: "Dryland", href: "/farm/dryland" },
-        { label: "Investment", href: "/farm/investment" },
+        { label: "Meet The Team", href: "/about/team" },
+        { label: "List with Us", href: "/about/list-with-us" },
+        { label: "Buying Land", href: "/about/buying-land" },
       ],
     },
     {
-      title: "Equestrian",
+      title: "More",
       items: [
-        { label: "Training Facilities", href: "/equestrian/training" },
-        { label: "Luxury Stables", href: "/equestrian/luxury" },
-        { label: "Pastures", href: "/equestrian/pastures" },
-      ],
-    },
-    {
-      title: "Estate",
-      items: [
-        { label: "Signature Estates", href: "/estate/signature" },
-        { label: "Vineyards", href: "/estate/vineyards" },
-        { label: "Waterfront", href: "/estate/waterfront" },
+        { label: "Short Films", href: "/short-films" },
+        { label: "Search for Land", href: "/search" },
+        { label: "Contact", href: "/contact" },
+        { label: "Expert Insights", href: "/resources/insights" },
       ],
     },
   ];
