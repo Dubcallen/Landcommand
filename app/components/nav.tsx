@@ -16,9 +16,12 @@ export default function Nav() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          {/* Swap to your actual logo asset */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/branding/logo.png" alt="LandCommand.ai" className="h-8 w-auto" />
+          <img
+            src="/branding/sight_only.png"
+            alt="LandCommand.ai"
+            className="h-8 w-auto"
+          />
         </Link>
 
         {/* Desktop nav */}
