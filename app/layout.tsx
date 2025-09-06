@@ -16,10 +16,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} min-h-dvh bg-brand-charcoal text-brand-linen`}>
+        {/* Overlaid header */}
         <Nav />
         {children}
-        <footer className="mt-16 border-t border-brand-linen/10">
-          <div className="section py-8 text-sm text-brand-linen/70">
+        <footer className="mt-16 border-t border-white/10">
+          <div className="mx-auto max-w-7xl px-4 py-8 text-sm text-white/70">
             © {new Date().getFullYear()} LandCommand.ai — All rights reserved.
           </div>
         </footer>
