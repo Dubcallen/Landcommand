@@ -18,7 +18,7 @@ export default function Nav() {
         <Link href="/" className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/branding/sight_only.png"
+            src="/sight_only.png"   // 👈 directly from /public
             alt="LandCommand.ai"
             className="h-8 w-auto"
           />
