@@ -12,8 +12,8 @@ export default function Hero({
   subhead = "Exceptional acreage for discerning buyers and sellers—thoughtfully presented and privately sourced.",
 }: HeroProps) {
   return (
-    <section className="relative isolate overflow-hidden">
-      {/* Background video */}
+    <section id="hero" className="relative isolate overflow-hidden">
+      {/* Background video from /public */}
       <div className="absolute inset-0 -z-10">
         <video
           autoPlay
@@ -29,17 +29,29 @@ export default function Hero({
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-brand-charcoal" />
       </div>
 
-      {/* Foreground content */}
-      <div className="section pt-32 pb-16 md:pt-40 md:pb-24">
-        <p className="text-[11px] uppercase tracking-nav text-brand-linen/80">{kicker}</p>
-        <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold leading-tight text-brand-linen md:text-5xl">
+      {/* Push content down so it clears the overlaid header */}
+      <div className="mx-auto max-w-7xl px-4 pt-36 pb-16 md:pt-44 md:pb-24">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-white/80">
+          {kicker}
+        </p>
+        <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold leading-tight text-white md:text-5xl">
           {headline}
         </h1>
-        <p className="mt-4 max-w-2xl text-brand-linen/85">{subhead}</p>
+        <p className="mt-4 max-w-2xl text-white/85">{subhead}</p>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <a href="/listings" className="btn btn--light">Browse Listings</a>
-          <a href="#private" className="btn btn--light">Private Listings</a>
+          <a
+            href="/listings"
+            className="inline-flex items-center rounded-xl border border-white/70 bg-white/0 px-4 py-2 font-medium text-white hover:bg-white/10"
+          >
+            Browse Listings
+          </a>
+          <a
+            href="/contact"
+            className="inline-flex items-center rounded-xl border border-white/70 bg-white/0 px-4 py-2 font-medium text-white hover:bg-white/10"
+          >
+            Private Listings
+          </a>
         </div>
       </div>
     </section>
