@@ -1,47 +1,55 @@
 "use client";
 
 import React from "react";
-import Hero from "./components/hero"; // 👈 lowercase import
+import Hero from "./components/hero";
+import ListingCard from "./components/listing-card";
 import { getAllListings, type Listing } from "../lib/listings";
+
+const STATES = ["Arizona","Colorado","Florida","Georgia","Idaho","Montana","New Mexico","North Carolina","Tennessee","Texas","Utah","Wyoming"];
 
 export default function HomePage() {
   const listings: Listing[] = getAllListings();
   const featured = listings.slice(0, 3);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 space-y-10">
-      {/* Hero section */}
-      <Hero imageSrc="/branding/hero.jpg" />
+    <main className="mx-auto max-w-7xl px-4 py-10 space-y-12">
+      {/* Hero */}
+      <Hero imageSrc="/hero.jpg" />
 
-      {/* Featured listings */}
-      <section>
-        <h2 className="mb-4 text-xl font-semibold text-brand-linen">Featured Listings</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((l) => (
-            <a
-              key={l.id}
-              href={`/listings/${l.slug}`}
-              className="block overflow-hidden rounded-2xl border border-brand-linen/20 bg-[#2A2A2A] hover:shadow-md transition"
-            >
-              <div className="aspect-[4/3] w-full bg-neutral-800 grid place-items-center text-neutral-500">
-                <span>{l.heroPhoto ? "Hero Image" : "Image Placeholder"}</span>
-              </div>
-              <div className="p-4 text-brand-linen">
-                <h3 className="text-lg font-semibold">{l.title}</h3>
-                <p className="mt-1 text-sm">
-                  {l.acreage.toLocaleString()} acres • {l.state}
-                </p>
-              </div>
-            </a>
+      {/* Short Films (placeholder thumbnails) */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-brand-linen">Short Films</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1,2,3].map((i) => (
+            <div key={i} className="aspect-video w-full overflow-hidden rounded-2xl border border-brand-linen/15 bg-[#2A2A2A] grid place-items-center text-brand-linen/60">
+              Video Placeholder
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Private Listings lead capture */}
-      <section
-        id="private"
-        className="rounded-2xl border border-brand-linen/20 bg-[#2A2A2A] p-6 md:p-10"
-      >
+      {/* Featured Listings */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-brand-linen">Featured Listings</h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((l) => (
+            <ListingCard
+              key={l.id}
+              slug={l.slug}
+              title={l.title}
+              acreage={l.acreage}
+              state={l.state}
+              county={l.county}
+              price={l.price}
+              status={l.status}
+              hero={l.heroPhoto ?? null}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Private Listings CTA */}
+      <section id="private" className="rounded-2xl border border-brand-linen/15 bg-[#2A2A2A] p-6 md:p-10">
         <h2 className="text-2xl font-semibold text-brand-linen">Private Listings</h2>
         <p className="mt-2 max-w-2xl text-brand-linen/80">
           Gain insider access to off-market opportunities before they hit the public market.
@@ -49,15 +57,26 @@ export default function HomePage() {
         <form className="mt-4 flex max-w-xl gap-3">
           <input
             placeholder="Your email"
-            className="flex-1 rounded-xl border border-brand-linen/40 bg-brand-charcoal px-3 py-2 text-brand-linen placeholder-brand-linen/50 outline-none"
+            className="flex-1 rounded-xl border border-brand-linen/30 bg-brand-charcoal px-3 py-2 text-brand-linen placeholder-brand-linen/50 outline-none"
           />
-          <button className="btn btn--outline">Request Access</button>
+          <button className="inline-flex items-center rounded-xl border border-brand-linen/70 bg-white/0 px-4 py-2 font-medium text-brand-linen hover:bg-white/10">
+            Request Access
+          </button>
         </form>
-        <p className="mt-2 text-xs text-brand-linen/60">
-          We respect privacy. Unsubscribe anytime.
-        </p>
+        <p className="mt-2 text-xs text-brand-linen/60">We respect privacy. Unsubscribe anytime.</p>
+      </section>
+
+      {/* LANDiO-style: Search by State */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-brand-linen">Search by State</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          {STATES.map((s) => (
+            <a key={s} href={`/states/${s.toLowerCase()}`} className="rounded-xl border border-brand-linen/15 bg-[#2A2A2A] px-3 py-2 text-sm text-brand-linen hover:shadow-md">
+              {s}
+            </a>
+          ))}
+        </div>
       </section>
     </main>
   );
 }
-
