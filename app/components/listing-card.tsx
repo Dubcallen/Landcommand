@@ -16,9 +16,12 @@ export default function ListingCard({
 }: CardProps) {
   const fmt = (n?: number) => (n != null ? `$${n.toLocaleString()}` : "Inquire");
   return (
-    <Link href={`/listings/${slug}`} className="group block overflow-hidden rounded-2xl border border-brand-linen/15 bg-[#2A2A2A] hover:shadow-md transition">
+    <Link
+      href={`/listings/${slug}`}
+      className="group overflow-hidden rounded-2xl border border-brand-linen/15 bg-[#2A2A2A] transition hover:shadow-card"
+    >
       <div className="aspect-[4/3] w-full bg-neutral-800 grid place-items-center text-neutral-500">
-        {/* Swap to next/image when assets are ready */}
+        {/* swap to next/image when assets are in place */}
         <span>{hero ? "Hero Image" : "Image Placeholder"}</span>
       </div>
       <div className="p-4 text-brand-linen">
