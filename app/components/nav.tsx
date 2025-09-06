@@ -4,13 +4,12 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Premium header with visible inertia:
- * - Centered large logo; 2 links left (with dropdowns), 2 links right
- * - Top-right hamburger → fullscreen overlay
- * - SPRING physics for delayed blur/tint + subtle vertical "drag"
- *   (header lags behind scroll a few pixels, then eases into place)
+ * Premium header with pronounced inertia + side drawer menu:
+ * - Centered large logo; 2 links left (dropdowns), 2 links right
+ * - Strong spring lag for blur/tint + vertical drag of the header bar
+ * - Hamburger opens a right-side drawer (not full-screen)
  *
- * Assets required:
+ * Assets:
  *   /public/sight_only.png  (light/white logo)
  */
 
@@ -50,21 +49,21 @@ const RIGHT_LINKS: MenuItem[] = [
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
 export default function Nav() {
-  // ------- SPRING STATE (for visible inertia) -------
-  // target = real scrollY; cur = smoothed scroll; vel = spring velocity
-  const [progress, setProgress] = useState(0);      // normalized 0..1 for styles
-  const [dragPx, setDragPx] = useState(0);          // small Y offset for the "drag"
+  // ------- SPRING (make lag obvious) -------
+  const [progress, setProgress] = useState(0); // 0..1
+  const [dragPx, setDragPx] = useState(0);     // visual vertical lag
 
   const targetRef = useRef(0);
   const curRef = useRef(0);
   const velRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
-  // tune these to taste (lower stiffness / damping = more floaty)
-  const STIFFNESS = 0.035; // spring k
-  const DAMPING   = 0.16;  // damping c
-  const MAXY      = 120;   // px range to map → progress (0..1)
-  const DRAG_SCALE = 0.25; // how many px of visual lag from (cur - target)
+  // Tuned for visible delay:
+  // Lower stiffness & damping = more floaty; bigger MAXY = slower ramp
+  const STIFFNESS = 0.02;  // was 0.035
+  const DAMPING   = 0.10;  // was 0.16
+  const MAXY      = 200;   // was 120 — increases the range to reach full tint
+  const DRAG_SCALE = 0.45; // was 0.25 — more visible bar lag
 
   useEffect(() => {
     const onScroll = () => {
@@ -75,7 +74,6 @@ export default function Nav() {
     const animate = () => {
       rafRef.current = requestAnimationFrame(animate);
 
-      // spring integration
       const target = targetRef.current;
       const x = curRef.current;
       const v = velRef.current;
@@ -88,22 +86,21 @@ export default function Nav() {
       curRef.current = nextX;
       velRef.current = nextV;
 
-      // normalized style progress (0..1 by MAXY)
       const p = clamp(nextX / MAXY, 0, 1);
       setProgress(p);
 
-      // visual drag (a few pixels of vertical lag)
-      const drag = (nextX - target) * DRAG_SCALE; // negative when catching up
+      // visible drag of the bar (few px)
+      const drag = (nextX - target) * DRAG_SCALE;
       setDragPx(drag);
 
-      // stop loop when we're extremely close
+      // stop when settled
       if (Math.abs(nextX - target) < 0.1 && Math.abs(nextV) < 0.1) {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
     };
 
-    onScroll(); // initialize
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
@@ -112,17 +109,17 @@ export default function Nav() {
   }, []);
 
   // ------- MENU / DROPDOWNS -------
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [openKey, setOpenKey] = useState<string | null>(null);
   const timers = useRef<Record<string, any>>({});
 
-  // ESC closes overlay
+  // ESC closes drawer
   useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDrawerOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
+  }, [drawerOpen]);
 
   const openWithDelay = (key: string) => {
     clearTimeout(timers.current[key]);
@@ -135,23 +132,24 @@ export default function Nav() {
     }, 120);
   };
 
-  // ------- STYLE MAPPING FROM progress -------
-  const blurPx   = 10 * progress;         // 0 → 10px blur
-  const tintA    = 0.35 * progress;       // 0 → 0.35 bg alpha
-  const borderA  = 0.10 * progress;       // 0 → 0.10 border alpha
-  const shadowA  = 0.25 * progress;       // 0 → 0.25 shadow alpha
-  const logoScale = 1 - 0.05 * progress;  // 1 → 0.95
+  // ------- STYLE MAPPING -------
+  const blurPx    = 12 * progress;        // 0 → 12px blur
+  const tintA     = 0.40 * progress;      // 0 → 0.40 bg alpha
+  const borderA   = 0.12 * progress;      // 0 → 0.12 border alpha
+  const shadowA   = 0.32 * progress;      // 0 → 0.32 shadow alpha
+  const logoScale = 1 - 0.06 * progress;  // 1 → 0.94
 
-  // compact container so links sit close to the centered logo
-  const containerClass = "mx-auto w-full max-w-5xl px-4";
+  // Narrow container so links stay close to the centered logo
+  const containerClass = "mx-auto w-full max-w-4xl px-4"; // tighter than 5xl
 
   return (
     <header className="pointer-events-none absolute inset-x-0 top-0 z-50">
+      {/* Top bar with visible lag */}
       <div
         className={`${containerClass} transition-[padding,transform] duration-300`}
         style={{
           pointerEvents: "auto",
-          transform: `translateY(${dragPx}px)`,                  // <-- the visible "drag"
+          transform: `translateY(${dragPx}px)`,
           backdropFilter: `blur(${blurPx}px)`,
           WebkitBackdropFilter: `blur(${blurPx}px)`,
           backgroundColor: `rgba(0,0,0,${tintA})`,
@@ -159,10 +157,10 @@ export default function Nav() {
           borderBottom: `1px solid rgba(255,255,255,${borderA})`,
         }}
       >
-        {/* Grid: left (dropdowns) | centered logo | right + burger */}
+        {/* Grid: left (dropdowns) | logo | right (links + burger) */}
         <div className="relative grid grid-cols-3 items-center py-6">
-          {/* LEFT MENU (dropdowns) */}
-          <nav className="hidden md:flex items-center justify-end gap-6 pr-2">
+          {/* LEFT with dropdowns */}
+          <nav className="hidden md:flex items-center justify-end gap-5 pr-1">
             {LEFT_LINKS.map((item) => {
               const key = item.label;
               const isOpen = openKey === key;
@@ -180,7 +178,6 @@ export default function Nav() {
                   >
                     {item.label}
                   </Link>
-
                   {item.dropdown && (
                     <div
                       className={`absolute left-1/2 z-50 mt-3 -translate-x-1/2 rounded-xl border border-white/10 bg-black/70 backdrop-blur
@@ -206,7 +203,7 @@ export default function Nav() {
             })}
           </nav>
 
-          {/* CENTER LOGO (scales slightly with progress) */}
+          {/* CENTER: large logo */}
           <div className="flex justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <Link href="/" className="inline-flex">
@@ -219,9 +216,9 @@ export default function Nav() {
             </Link>
           </div>
 
-          {/* RIGHT LINKS + HAMBURGER */}
-          <div className="flex items-center justify-start gap-4 pl-2">
-            <nav className="hidden md:flex items-center gap-6">
+          {/* RIGHT: links + hamburger */}
+          <div className="flex items-center justify-start gap-4 pl-1">
+            <nav className="hidden md:flex items-center gap-5">
               {RIGHT_LINKS.map((l) => (
                 <Link
                   key={l.href}
@@ -234,12 +231,12 @@ export default function Nav() {
               ))}
             </nav>
 
-            {/* 3-bar hamburger (always visible) */}
+            {/* Hamburger → opens right drawer */}
             <button
               aria-label="Open menu"
-              aria-expanded={menuOpen}
-              aria-controls="site-menu"
-              onClick={() => setMenuOpen(true)}
+              aria-expanded={drawerOpen}
+              aria-controls="site-drawer"
+              onClick={() => setDrawerOpen(true)}
               className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 backdrop-blur text-white/90 hover:bg-white/10"
             >
               <span className="sr-only">Open menu</span>
@@ -251,63 +248,82 @@ export default function Nav() {
         </div>
       </div>
 
-      {/* FULLSCREEN OVERLAY MENU */}
+      {/* RIGHT-SIDE DRAWER (not full-screen) */}
       <div
-        id="site-menu"
-        aria-hidden={!menuOpen}
-        className={`fixed inset-0 z-[60] transition-opacity duration-200 ${menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[60] ${drawerOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        aria-hidden={!drawerOpen}
       >
         {/* Backdrop */}
-        <div onClick={() => setMenuOpen(false)} className="absolute inset-0 bg-black/60 backdrop-blur" />
+        <div
+          className={`absolute inset-0 transition-opacity duration-200 ${drawerOpen ? "opacity-100" : "opacity-0"}`}
+          onClick={() => setDrawerOpen(false)}
+          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+        />
 
-        {/* Panel */}
-        <div className="relative mx-auto mt-16 w-full max-w-3xl rounded-2xl border border-white/10 bg-black/70 p-6 text-center shadow-[0_12px_40px_rgba(0,0,0,0.45)]">
-          <button
-            aria-label="Close menu"
-            onClick={() => setMenuOpen(false)}
-            className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 text-white/90 hover:bg-white/10"
-          >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 6l12 12M18 6l-12 12" />
-            </svg>
-          </button>
-
-          <div className="space-y-6">
-            <div className="flex justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/sight_only.png" alt="LandCommand.ai" className="h-12 w-auto" />
+        {/* Drawer panel */}
+        <aside
+          id="site-drawer"
+          className={`absolute right-0 top-0 h-full w-[90vw] max-w-[420px] transform transition-transform duration-250
+                      ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}
+        >
+          <div className="flex h-full flex-col gap-4 border-l border-white/10 bg-black/70 p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur">
+            {/* Close */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/sight_only.png" alt="LandCommand.ai" className="h-8 w-auto" />
+              </div>
+              <button
+                aria-label="Close menu"
+                onClick={() => setDrawerOpen(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 text-white/90 hover:bg-white/10"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 6l12 12M18 6l-12 12" />
+                </svg>
+              </button>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2">
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.24em] text-white/60">Explore</p>
+            {/* Groups similar to header */}
+            <div className="mt-2 grid gap-8">
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.24em] text-white/60">Explore</p>
                 <ul className="space-y-1">
-                  <li><Link href="/properties" className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Properties</Link></li>
-                  <li><Link href="/about" className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">About</Link></li>
+                  <li><Link href="/properties" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Properties</Link></li>
+                  <li><Link href="/about" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">About</Link></li>
                 </ul>
               </div>
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.24em] text-white/60">More</p>
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.24em] text-white/60">More</p>
                 <ul className="space-y-1">
-                  <li><Link href="/short-films" className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Short Films</Link></li>
-                  <li><Link href="/contact" className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Contact</Link></li>
+                  <li><Link href="/short-films" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Short Films</Link></li>
+                  <li><Link href="/contact" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Contact</Link></li>
                 </ul>
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.24em] text-white/60">Status</p>
+                <ul className="grid grid-cols-1 gap-1 md:grid-cols-1">
+                  <li><Link href="/properties/available" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Available Listings</Link></li>
+                  <li><Link href="/properties/under-contract" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Under Contract</Link></li>
+                  <li><Link href="/properties/sold" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Sold</Link></li>
+                </ul>
+              </div>
+
+              <div className="pt-2">
+                <Link
+                  href="/contact"
+                  onClick={() => setDrawerOpen(false)}
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-white/70 px-6 py-3 font-medium text-white hover:bg-white/10"
+                >
+                  Speak with a Specialist
+                </Link>
               </div>
             </div>
 
-            <div className="grid gap-2 md:grid-cols-3">
-              <Link href="/properties/available" className="block rounded-lg px-3 py-2 text-white/80 hover:bg-white/10">Available Listings</Link>
-              <Link href="/properties/under-contract" className="block rounded-lg px-3 py-2 text-white/80 hover:bg-white/10">Under Contract</Link>
-              <Link href="/properties/sold" className="block rounded-lg px-3 py-2 text-white/80 hover:bg-white/10">Sold</Link>
-            </div>
-
-            <div className="pt-2">
-              <Link href="/contact" className="inline-flex items-center rounded-xl border border-white/70 px-6 py-3 font-medium text-white hover:bg-white/10">
-                Speak with a Specialist
-              </Link>
-            </div>
+            <div className="mt-auto text-center text-xs text-white/60">© {new Date().getFullYear()} LandCommand.ai</div>
           </div>
-        </div>
+        </aside>
       </div>
     </header>
   );
