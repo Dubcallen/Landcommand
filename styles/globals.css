@@ -2,30 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base colors */
+/* Base canvas */
 html, body {
   background-color: theme("colors.brand.charcoal");
   color: theme("colors.brand.linen");
   @apply antialiased;
 }
 
-/* Links */
-a {
-  @apply text-brand-green hover:opacity-80;
-}
-
 /* Buttons */
 .btn {
-  @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium transition;
+  @apply inline-flex items-center justify-center rounded-xl border px-4 py-2 font-medium transition;
 }
-.btn--primary {
-  @apply bg-brand-green text-white hover:opacity-90;
-}
-.btn--outline {
-  @apply border border-brand-linen text-brand-linen hover:bg-brand-linen hover:text-brand-charcoal;
+.btn--light {
+  @apply border-brand-linen/70 text-brand-linen bg-transparent hover:bg-white/10;
 }
 
-/* Cards */
-.card {
-  @apply rounded-2xl border border-brand-linen/20 bg-[#2A2A2A] shadow-sm text-brand-linen;
+/* Cards on dark */
+.card-dark {
+  @apply rounded-2xl border border-brand-linen/15 bg-[#2A2A2A] text-brand-linen;
+}
+
+/* Section container */
+.section {
+  @apply mx-auto max-w-7xl px-4;
 }
