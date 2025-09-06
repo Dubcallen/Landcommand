@@ -13,23 +13,20 @@ const LINKS = [
 export default function Nav() {
   return (
     <header className="absolute inset-x-0 top-0 z-50">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-6">
-        {/* Logo (light version is best for dark hero backgrounds) */}
+      <div className="section flex items-center justify-between py-6">
+        {/* Logo (light mark recommended) */}
         <Link href="/" className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/sight_only.png"
-            alt="LandCommand.ai"
-            className="h-10 w-auto"
-          />
+          <img src="/sight_only.png" alt="LandCommand.ai" className="h-10 w-auto" />
         </Link>
 
+        {/* Desktop nav */}
         <nav className="hidden gap-8 md:flex">
           {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className="text-xs uppercase tracking-[0.24em] text-white hover:text-brand-linen"
+              className="text-[11px] uppercase tracking-nav text-white/90 hover:text-white"
             >
               {l.label}
             </Link>
