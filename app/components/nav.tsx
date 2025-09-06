@@ -4,19 +4,23 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 /**
- * Mirrored header:
- * - Logo centered (large)
- * - Two links on the left, two on the right
- * - Overlaid on hero with subtle blur/tint that strengthens on scroll
+ * Mirrors Covey Rise header structure:
+ * - Large centered logo
+ * - Two links on left, two on right
+ * - Transparent over hero initially
+ * - On scroll: subtle backdrop blur + dark tint + thin bottom border
+ *
+ * Assets expected:
+ *   /public/sight_only.png  (light/white logo recommended)
  */
 
 const LEFT_LINKS = [
-  { href: "/listings", label: "Listings" },
-  { href: "/buy", label: "Buy" },
+  { href: "/properties", label: "Properties" }, // could route to /active-listings
+  { href: "/about", label: "About" },
 ];
 
 const RIGHT_LINKS = [
-  { href: "/regions", label: "Regions" },
+  { href: "/short-films", label: "Short Films" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -31,17 +35,18 @@ export default function Nav() {
   }, []);
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50">
+    <header className="pointer-events-none absolute inset-x-0 top-0 z-50">
+      {/* The bar that gains blur/tint/border after a tiny scroll */}
       <div
         className={[
-          "mx-auto w-full max-w-7xl px-4",
-          "transition-all duration-300",
+          "mx-auto w-full max-w-7xl px-4 transition-all duration-300",
           scrolled
             ? "backdrop-blur bg-black/35 border-b border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.25)]"
             : "bg-transparent",
         ].join(" ")}
+        style={{ pointerEvents: "auto" }}
       >
-        {/* 3-column grid: left links / centered logo / right links */}
+        {/* 3-column grid: L links | center logo | R links */}
         <div className="grid grid-cols-3 items-center py-6">
           {/* Left links */}
           <nav className="hidden md:flex items-center gap-8">
@@ -49,21 +54,25 @@ export default function Nav() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="text-[11px] uppercase tracking-[0.24em] text-white/90 hover:text-white relative after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-white/80 after:transition-all hover:after:w-full"
+                className="relative text-[11px] uppercase tracking-[0.24em] text-white/90 hover:text-white after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-white/80 after:transition-all hover:after:w-full"
               >
                 {l.label}
               </Link>
             ))}
           </nav>
 
-          {/* Center logo */}
+          {/* Centered logo (larger) */}
           <div className="flex justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <Link href="/" className="inline-flex">
               <img
-                src="/sight_only.png"  /* place file in /public/sight_only.png */
+                src="/sight_only.png"
                 alt="LandCommand.ai"
-                className="h-14 w-auto md:h-16 lg:h-20 transition-transform duration-300"
+                className={[
+                  "h-16 w-auto md:h-20 lg:h-24",
+                  "transition-transform duration-300",
+                  scrolled ? "scale-[0.95]" : "scale-100",
+                ].join(" ")}
               />
             </Link>
           </div>
@@ -74,17 +83,15 @@ export default function Nav() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="text-[11px] uppercase tracking-[0.24em] text-white/90 hover:text-white relative after:absolute after:right-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-white/80 after:transition-all hover:after:w-full"
+                className="relative text-[11px] uppercase tracking-[0.24em] text-white/90 hover:text-white after:absolute after:right-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-white/80 after:transition-all hover:after:w-full"
               >
                 {l.label}
               </Link>
             ))}
           </nav>
 
-          {/* Mobile: logo only (links hidden) */}
-          <div className="col-span-3 flex items-center justify-center md:hidden">
-            {/* handled above; no extra content needed */}
-          </div>
+          {/* Mobile: we keep the exact “centered logo” look, links hidden */}
+          <div className="col-span-3 flex items-center justify-center md:hidden" />
         </div>
       </div>
     </header>
