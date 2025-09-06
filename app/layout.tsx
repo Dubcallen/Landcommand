@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import type { ReactNode } from "react";
 import { Inter, Playfair_Display } from "next/font/google";
-import Nav from "./components/nav"; // 👈 lowercase
+import Nav from "./components/nav"; // 👈 lowercase import
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-display" });
@@ -15,7 +15,9 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} min-h-dvh bg-brand-charcoal text-brand-linen antialiased`}>
+      <body
+        className={`${inter.variable} ${playfair.variable} min-h-dvh bg-brand-charcoal text-brand-linen antialiased`}
+      >
         <Nav />
         {children}
         <footer className="mt-16 border-t border-brand-linen/10">
