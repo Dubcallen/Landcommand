@@ -1,307 +1,330 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 /**
- * Nav (no external deps)
- * - Centered large logo
- * - Left + right hover dropdown menus
- * - Pronounced delayed scroll lag + vertical drag (requestAnimationFrame + lerp)
- * - Top-right hamburger opening a right side drawer (pure React + CSS)
+ * Premium header with pronounced inertia + side drawer menu:
+ * - Centered large logo; 2 links left (dropdowns), 2 links right
+ * - Strong spring lag for blur/tint + vertical drag of the header bar
+ * - Hamburger opens a right-side drawer (not full-screen)
+ *
+ * Assets:
+ *   /public/sight_only.png  (light/white logo)
  */
 
-// --- Small helpers for scroll lag ---
-function useScrollLag() {
-  const [lag, setLag] = React.useState(0);
-  const currentRef = React.useRef(0);
-  const targetRef = React.useRef(0);
-  const rafRef = React.useRef<number | null>(null);
+type MenuItem = {
+  href: string;
+  label: string;
+  dropdown?: { href: string; label: string }[];
+};
 
-  React.useEffect(() => {
+const LEFT_LINKS: MenuItem[] = [
+  {
+    href: "/properties",
+    label: "Properties",
+    dropdown: [
+      { href: "/properties/available", label: "Available Listings" },
+      { href: "/properties/under-contract", label: "Under Contract" },
+      { href: "/properties/sold", label: "Sold" },
+    ],
+  },
+  {
+    href: "/about",
+    label: "About",
+    dropdown: [
+      { href: "/about/firm", label: "The Firm" },
+      { href: "/about/process", label: "Process" },
+      { href: "/about/press", label: "Press" },
+    ],
+  },
+];
+
+const RIGHT_LINKS: MenuItem[] = [
+  { href: "/short-films", label: "Short Films" },
+  { href: "/contact", label: "Contact" },
+];
+
+// clamp utility
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+export default function Nav() {
+  // ------- SPRING (make lag obvious) -------
+  const [progress, setProgress] = useState(0); // 0..1
+  const [dragPx, setDragPx] = useState(0);     // visual vertical lag
+
+  const targetRef = useRef(0);
+  const curRef = useRef(0);
+  const velRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+
+  // Tuned for visible delay:
+  // Lower stiffness & damping = more floaty; bigger MAXY = slower ramp
+  const STIFFNESS = 0.02;  // was 0.035
+  const DAMPING   = 0.10;  // was 0.16
+  const MAXY      = 200;   // was 120 — increases the range to reach full tint
+  const DRAG_SCALE = 0.45; // was 0.25 — more visible bar lag
+
+  useEffect(() => {
     const onScroll = () => {
-      targetRef.current = Math.min(window.scrollY, 600); // clamp for mapping
+      targetRef.current = window.scrollY;
+      if (rafRef.current == null) animate();
     };
+
+    const animate = () => {
+      rafRef.current = requestAnimationFrame(animate);
+
+      const target = targetRef.current;
+      const x = curRef.current;
+      const v = velRef.current;
+
+      // F = k(target - x) - c*v
+      const force = STIFFNESS * (target - x) - DAMPING * v;
+      const nextV = v + force;
+      const nextX = x + nextV;
+
+      curRef.current = nextX;
+      velRef.current = nextV;
+
+      const p = clamp(nextX / MAXY, 0, 1);
+      setProgress(p);
+
+      // visible drag of the bar (few px)
+      const drag = (nextX - target) * DRAG_SCALE;
+      setDragPx(drag);
+
+      // stop when settled
+      if (Math.abs(nextX - target) < 0.1 && Math.abs(nextV) < 0.1) {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-
-    const tick = () => {
-      // lerp current toward target
-      const c = currentRef.current;
-      const t = targetRef.current;
-      const next = c + (t - c) * 0.12; // adjust factor for more/less drag
-      currentRef.current = next;
-      // map 0..600 -> 0..40
-      const translate = (next / 600) * 40; // px
-      setLag(translate);
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
     return () => {
       window.removeEventListener("scroll", onScroll);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
-  // backdrop opacity map: 0..600 -> 0.1..0.35
-  const opacity = React.useMemo(() => {
-    const y = Math.min(currentRef.current, 600);
-    return 0.1 + (y / 600) * (0.35 - 0.1);
-  }, [lag]);
+  // ------- MENU / DROPDOWNS -------
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const timers = useRef<Record<string, any>>({});
 
-  return { lag, opacity };
-}
+  // ESC closes drawer
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDrawerOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [drawerOpen]);
 
-export default function Nav() {
-  const { lag, opacity } = useScrollLag();
-  const [open, setOpen] = React.useState(false);
+  const openWithDelay = (key: string) => {
+    clearTimeout(timers.current[key]);
+    timers.current[key] = setTimeout(() => setOpenKey(key), 80);
+  };
+  const closeWithDelay = (key: string) => {
+    clearTimeout(timers.current[key]);
+    timers.current[key] = setTimeout(() => {
+      if (openKey === key) setOpenKey(null);
+    }, 120);
+  };
+
+  // ------- STYLE MAPPING -------
+  const blurPx    = 12 * progress;        // 0 → 12px blur
+  const tintA     = 0.40 * progress;      // 0 → 0.40 bg alpha
+  const borderA   = 0.12 * progress;      // 0 → 0.12 border alpha
+  const shadowA   = 0.32 * progress;      // 0 → 0.32 shadow alpha
+  const logoScale = 1 - 0.06 * progress;  // 1 → 0.94
+
+  // Narrow container so links stay close to the centered logo
+  const containerClass = "mx-auto w-full max-w-4xl px-4"; // tighter than 5xl
 
   return (
-    <nav
-      style={{ transform: `translateY(${-lag}px)`, background: "rgba(12,12,12,0.35)" as const, backdropFilter: "saturate(140%) blur(8px)" }}
-      className="fixed inset-x-0 top-0 z-50 border-b border-white/10"
-    >
-      {/* translucent underlay intensifies with scroll */}
-      <div style={{ opacity }} className="pointer-events-none absolute inset-0 bg-black" />
+    <header className="pointer-events-none absolute inset-x-0 top-0 z-50">
+      {/* Top bar with visible lag */}
+      <div
+        className={`${containerClass} transition-[padding,transform] duration-300`}
+        style={{
+          pointerEvents: "auto",
+          transform: `translateY(${dragPx}px)`,
+          backdropFilter: `blur(${blurPx}px)`,
+          WebkitBackdropFilter: `blur(${blurPx}px)`,
+          backgroundColor: `rgba(0,0,0,${tintA})`,
+          boxShadow: `0 8px 24px rgba(0,0,0,${shadowA})`,
+          borderBottom: `1px solid rgba(255,255,255,${borderA})`,
+        }}
+      >
+        {/* Grid: left (dropdowns) | logo | right (links + burger) */}
+        <div className="relative grid grid-cols-3 items-center py-6">
+          {/* LEFT with dropdowns */}
+          <nav className="hidden md:flex items-center justify-end gap-5 pr-1">
+            {LEFT_LINKS.map((item) => {
+              const key = item.label;
+              const isOpen = openKey === key;
+              return (
+                <div
+                  key={key}
+                  className="relative"
+                  onMouseEnter={() => openWithDelay(key)}
+                  onMouseLeave={() => closeWithDelay(key)}
+                >
+                  <Link
+                    href={item.href}
+                    className="relative text-[11px] uppercase tracking-[0.24em] text-white/90 hover:text-white
+                               after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-white/80 after:transition-all hover:after:w-full"
+                  >
+                    {item.label}
+                  </Link>
+                  {item.dropdown && (
+                    <div
+                      className={`absolute left-1/2 z-50 mt-3 -translate-x-1/2 rounded-xl border border-white/10 bg-black/70 backdrop-blur
+                                  shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-200
+                                  ${isOpen ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 -translate-y-1"}`}
+                    >
+                      <ul className="p-2 whitespace-nowrap">
+                        {item.dropdown.map((d) => (
+                          <li key={d.href}>
+                            <Link
+                              href={d.href}
+                              className="block rounded-lg px-3 py-2 text-[12px] tracking-wide text-white/90 hover:bg-white/10 hover:text-white"
+                            >
+                              {d.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
 
-      <div className="relative mx-auto grid h-[76px] max-w-[1120px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-5 lg:px-6">
-        {/* Left menu (desktop) */}
-        <div className="hidden items-center justify-end pr-6 md:flex">
-          <NavMenu
-            items={[
-              {
-                label: "Properties",
-                href: "/properties",
-                children: [
-                  { label: "Active Listings", href: "/properties/active" },
-                  { label: "Private Listings", href: "/properties/private" },
-                  { label: "Notable Sales", href: "/properties/notable" },
-                ],
-              },
-              {
-                label: "About",
-                href: "/about",
-                children: [
-                  { label: "Meet The Team", href: "/about/team" },
-                  { label: "List with Us", href: "/about/list-with-us" },
-                  { label: "Buying Land", href: "/about/buying-land" },
-                ],
-              },
-            ]}
-          />
-        </div>
-
-        {/* Center logo */}
-        <div className="flex items-center justify-center">
-          <Link href="/" className="relative inline-flex items-center">
-            <Image
-              src="/logo.svg"
-              alt="LandCommand"
-              width={160}
-              height={54}
-              priority
-              className="h-12 w-auto drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]"
-            />
-          </Link>
-        </div>
-
-        {/* Right menu + hamburger */}
-        <div className="flex items-center justify-start gap-2 pl-6">
-          <div className="hidden md:flex">
-            <NavMenu
-              items={[
-                { label: "Short Films", href: "/short-films" },
-                { label: "Search for Land", href: "/search" },
-                { label: "Contact", href: "/contact" },
-                {
-                  label: "Resources",
-                  href: "/resources",
-                  children: [
-                    { label: "Expert Insights", href: "/resources/insights" },
-                  ],
-                },
-              ]}
-            />
+          {/* CENTER: large logo */}
+          <div className="flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <Link href="/" className="inline-flex">
+              <img
+                src="/sight_only.png"
+                alt="LandCommand.ai"
+                style={{ transform: `scale(${logoScale})` }}
+                className="h-16 w-auto md:h-20 lg:h-24 will-change-transform transition-transform duration-300"
+              />
+            </Link>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            aria-label="Open menu"
-            onClick={() => setOpen(true)}
-            className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 transition hover:bg-white/15"
-          >
-            <Hamburger open={open} />
-          </button>
+          {/* RIGHT: links + hamburger */}
+          <div className="flex items-center justify-start gap-4 pl-1">
+            <nav className="hidden md:flex items-center gap-5">
+              {RIGHT_LINKS.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="relative text-[11px] uppercase tracking-[0.24em] text-white/90 hover:text-white
+                             after:absolute after:right-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-white/80 after:transition-all hover:after:w-full"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Hamburger → opens right drawer */}
+            <button
+              aria-label="Open menu"
+              aria-expanded={drawerOpen}
+              aria-controls="site-drawer"
+              onClick={() => setDrawerOpen(true)}
+              className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 backdrop-blur text-white/90 hover:bg-white/10"
+            >
+              <span className="sr-only">Open menu</span>
+              <span className="block h-0.5 w-5 bg-white" />
+              <span className="mt-1 block h-0.5 w-5 bg-white" />
+              <span className="mt-1 block h-0.5 w-5 bg-white" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Side Drawer (no shadcn) */}
-      <Drawer open={open} onClose={() => setOpen(false)}>
-        <MobileNav onNavigate={() => setOpen(false)} />
-      </Drawer>
-    </nav>
-  );
-}
+      {/* RIGHT-SIDE DRAWER (not full-screen) */}
+      <div
+        className={`fixed inset-0 z-[60] ${drawerOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+        aria-hidden={!drawerOpen}
+      >
+        {/* Backdrop */}
+        <div
+          className={`absolute inset-0 transition-opacity duration-200 ${drawerOpen ? "opacity-100" : "opacity-0"}`}
+          onClick={() => setDrawerOpen(false)}
+          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+        />
 
-// --- Desktop Menu with hover dropdowns (no external icons) ---
-function NavMenu({
-  items,
-}: {
-  items: { label: string; href: string; children?: { label: string; href: string }[] }[];
-}) {
-  return (
-    <nav className="flex items-center gap-8">
-      {items.map((item) => (
-        <div key={item.label} className="group relative">
-          <Link
-            href={item.href}
-            className="inline-flex items-center gap-1 text-[12px] font-semibold uppercase tracking-[0.32em] text-white/90 transition-colors hover:text-white hover:underline underline-offset-[6px] decoration-white/80"
-          >
-            <span>{item.label}</span>
-            {item.children?.length ? (
-              <svg viewBox="0 0 24 24" className="h-4 w-4 transition-transform group-hover:rotate-180" aria-hidden>
-                <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            ) : null}
-          </Link>
+        {/* Drawer panel */}
+        <aside
+          id="site-drawer"
+          className={`absolute right-0 top-0 h-full w-[90vw] max-w-[420px] transform transition-transform duration-250
+                      ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}
+        >
+          <div className="flex h-full flex-col gap-4 border-l border-white/10 bg-black/70 p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur">
+            {/* Close */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/sight_only.png" alt="LandCommand.ai" className="h-8 w-auto" />
+              </div>
+              <button
+                aria-label="Close menu"
+                onClick={() => setDrawerOpen(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 text-white/90 hover:bg-white/10"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 6l12 12M18 6l-12 12" />
+                </svg>
+              </button>
+            </div>
 
-          {item.children?.length ? (
-            <div className="pointer-events-none absolute left-1/2 top-8 z-50 w-56 -translate-x-1/2 opacity-0 shadow-2xl ring-1 ring-white/10 drop-shadow-xl transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
-              <div className="rounded-2xl border border-white/10 bg-black/70 p-2 backdrop-blur-md">
-                {item.children.map((child) => (
-                  <Link
-                    key={child.label}
-                    href={child.href}
-                    className="flex items-center justify-between rounded-xl px-3 py-2 text-sm text-white/90 transition hover:bg-white/5 hover:text-white"
-                  >
-                    {child.label}
-                    <svg viewBox="0 0 24 24" className="h-4 w-4 opacity-60" aria-hidden>
-                      <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </Link>
-                ))}
+            {/* Groups similar to header */}
+            <div className="mt-2 grid gap-8">
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.24em] text-white/60">Explore</p>
+                <ul className="space-y-1">
+                  <li><Link href="/properties" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Properties</Link></li>
+                  <li><Link href="/about" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">About</Link></li>
+                </ul>
+              </div>
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.24em] text-white/60">More</p>
+                <ul className="space-y-1">
+                  <li><Link href="/short-films" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Short Films</Link></li>
+                  <li><Link href="/contact" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Contact</Link></li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs uppercase tracking-[0.24em] text-white/60">Status</p>
+                <ul className="grid grid-cols-1 gap-1 md:grid-cols-1">
+                  <li><Link href="/properties/available" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Available Listings</Link></li>
+                  <li><Link href="/properties/under-contract" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Under Contract</Link></li>
+                  <li><Link href="/properties/sold" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Sold</Link></li>
+                </ul>
+              </div>
+
+              <div className="pt-2">
+                <Link
+                  href="/contact"
+                  onClick={() => setDrawerOpen(false)}
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-white/70 px-6 py-3 font-medium text-white hover:bg-white/10"
+                >
+                  Speak with a Specialist
+                </Link>
               </div>
             </div>
-          ) : null}
-        </div>
-      ))}
-    </nav>
-  );
-}
 
-// --- Hamburger (3 bars -> X) ---
-function Hamburger({ open }: { open: boolean }) {
-  return (
-    <div className="relative h-5 w-6">
-      <span
-        className={`absolute left-0 top-0 block h-0.5 w-6 origin-center rounded bg-white transition-transform duration-300 ${
-          open ? "translate-y-[10px] rotate-45" : "translate-y-0 rotate-0"
-        }`}
-      />
-      <span
-        className={`absolute left-0 top-1/2 block h-0.5 w-6 -translate-y-1/2 origin-center rounded bg-white transition-opacity duration-200 ${
-          open ? "opacity-0" : "opacity-100"
-        }`}
-      />
-      <span
-        className={`absolute left-0 bottom-0 block h-0.5 w-6 origin-center rounded bg-white transition-transform duration-300 ${
-          open ? "-translate-y-[10px] -rotate-45" : "translate-y-0 rotate-0"
-        }`}
-      />
-    </div>
-  );
-}
-
-// --- No-deps Drawer ---
-function Drawer({ open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode }) {
-  return (
-    <>
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}
-        onClick={onClose}
-      />
-
-      {/* Panel */}
-      <aside
-        className={`fixed right-0 top-0 z-[61] h-dvh w-[320px] sm:w-[380px] border-l border-white/10 bg-black/70 p-0 text-white backdrop-blur-md transition-transform ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className="px-4 py-3 border-b border-white/10">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="LandCommand" width={120} height={36} className="h-9 w-auto" />
-            <button onClick={onClose} aria-label="Close menu" className="ml-auto rounded-lg px-3 py-1 text-sm text-white/80 hover:bg-white/10">Close</button>
+            <div className="mt-auto text-center text-xs text-white/60">© {new Date().getFullYear()} LandCommand.ai</div>
           </div>
-        </div>
-        <div className="max-h-[calc(100dvh-60px)] overflow-y-auto">{children}</div>
-      </aside>
-    </>
-  );
-}
-
-// --- Mobile Drawer Content ---
-function MobileNav({ onNavigate }: { onNavigate?: () => void }) {
-  const groups = [
-    {
-      title: "Properties",
-      items: [
-        { label: "Active Listings", href: "/properties/active" },
-        { label: "Private Listings", href: "/properties/private" },
-        { label: "Notable Sales", href: "/properties/notable" },
-      ],
-    },
-    {
-      title: "About",
-      items: [
-        { label: "Meet The Team", href: "/about/team" },
-        { label: "List with Us", href: "/about/list-with-us" },
-        { label: "Buying Land", href: "/about/buying-land" },
-      ],
-    },
-    {
-      title: "More",
-      items: [
-        { label: "Short Films", href: "/short-films" },
-        { label: "Search for Land", href: "/search" },
-        { label: "Contact", href: "/contact" },
-        { label: "Expert Insights", href: "/resources/insights" },
-      ],
-    },
-  ];
-
-  return (
-    <div className="flex flex-col gap-1 py-2">
-      {groups.map((g) => (
-        <div key={g.title} className="px-2 py-1">
-          <div className="px-3 py-2 text-xs uppercase tracking-wider text-white/60">{g.title}</div>
-          <div className="flex flex-col">
-            {g.items.map((i) => (
-              <Link
-                key={i.label}
-                href={i.href}
-                onClick={onNavigate}
-                className="rounded-xl px-3 py-2 text-sm text-white/90 transition hover:bg-white/5 hover:text-white"
-              >
-                {i.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ))}
-
-      <div className="mt-2 border-t border-white/10 p-3">
-        <Link
-          href="/contact"
-          onClick={onNavigate}
-          className="block rounded-xl bg-white/10 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-white/15"
-        >
-          Speak with a Specialist
-        </Link>
+        </aside>
       </div>
-    </div>
+    </header>
   );
 }
