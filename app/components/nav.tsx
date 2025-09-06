@@ -73,9 +73,9 @@ export default function Nav() {
       {/* translucent underlay intensifies with scroll */}
       <motion.div style={{ opacity: backdropOpacity }} className="absolute inset-0 bg-black" />
 
-      <div className="relative mx-auto grid h-20 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto grid h-[76px] max-w-[1120px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 lg:px-8">
         {/* Left menu (desktop) */}
-        <div className="hidden items-center justify-start md:flex">
+        <div className="hidden items-center justify-end md:flex pr-6">
           <NavMenu
             items={[
               {
@@ -115,7 +115,7 @@ export default function Nav() {
         </div>
 
         {/* Right menu + hamburger */}
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-start gap-2 pl-6">
           <div className="hidden md:flex">
             <NavMenu
               items={[
@@ -139,7 +139,7 @@ export default function Nav() {
                 variant="ghost"
                 size="icon"
                 aria-label="Open menu"
-                className="ml-1 h-10 w-10 rounded-2xl p-0"
+                className="ml-1 h-10 w-10 rounded-xl p-0 bg-white/10 hover:bg-white/15 ring-1 ring-white/15"
               >
                 <AnimatedHamburger open={open} />
               </Button>
@@ -169,12 +169,12 @@ function NavMenu({
   items: { label: string; href: string; children?: { label: string; href: string }[] }[];
 }) {
   return (
-    <nav className="flex items-center gap-6">
+    <nav className="flex items-center gap-8">
       {items.map((item) => (
         <div key={item.label} className="group relative">
           <Link
             href={item.href}
-            className="inline-flex items-center gap-1 text-[12px] font-semibold tracking-[0.32em] uppercase text-white/90 transition-colors hover:text-white"
+            className="inline-flex items-center gap-1 text-[12px] font-semibold tracking-[0.32em] uppercase text-white/90 transition-colors hover:text-white hover:underline underline-offset-[6px] decoration-white/80"
           >
             <span>{item.label}</span>
             {item.children?.length ? (
