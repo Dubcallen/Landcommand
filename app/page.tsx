@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Hero from "./components/Hero";
+import Hero from "./components/hero"; // 👈 lowercase import
 import { getAllListings, type Listing } from "../lib/listings";
 
 export default function HomePage() {
@@ -10,7 +10,10 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 space-y-10">
+      {/* Hero section */}
       <Hero imageSrc="/branding/hero.jpg" />
+
+      {/* Featured listings */}
       <section>
         <h2 className="mb-4 text-xl font-semibold text-brand-linen">Featured Listings</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -33,6 +36,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Private Listings lead capture */}
       <section
         id="private"
         className="rounded-2xl border border-brand-linen/20 bg-[#2A2A2A] p-6 md:p-10"
@@ -55,3 +60,4 @@ export default function HomePage() {
     </main>
   );
 }
+
