@@ -41,6 +41,7 @@ const clamp = (n: number, min: number, max: number) =>
   Math.min(max, Math.max(min, n));
 
 export default function Nav() {
+  // delayed scroll / inertia like Covey Rise
   const [progress, setProgress] = useState(0);
   const [dragY, setDragY] = useState(0);
   const target = useRef(0);
@@ -87,7 +88,6 @@ export default function Nav() {
   const tint = 0.4 * progress;
   const border = 0.12 * progress;
   const shadow = 0.32 * progress;
-  const logoScale = 1 - 0.06 * progress;
 
   const [openKey, setOpenKey] = useState<string | null>(null);
   const timers = useRef<Record<string, any>>({});
@@ -102,13 +102,12 @@ export default function Nav() {
     }, 120);
   };
 
-  const [drawer, setDrawer] = useState(false);
-
   const Caret = ({ open }: { open?: boolean }) => (
     <span
       className={`ml-2 inline-block transition-transform duration-200 ${
         open ? "rotate-180" : ""
       }`}
+      aria-hidden
     >
       ▾
     </span>
@@ -128,9 +127,9 @@ export default function Nav() {
           borderBottom: `1px solid rgba(255,255,255,${border})`,
         }}
       >
-        {/* three columns: left group | centered logo | right group */}
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center py-6">
-          {/* LEFT GROUP */}
+        {/* two columns with an empty center gap effect via justify-end/start */}
+        <div className="grid grid-cols-2 items-center py-6">
+          {/* LEFT group (aligned to right edge of column, near center) */}
           <nav className="flex items-center justify-end gap-12">
             {LEFT_MENU.map((m) => {
               const isOpen = openKey === m.label;
@@ -151,16 +150,18 @@ export default function Nav() {
                   </Link>
                   {hasDrop && (
                     <div
-                      className={`absolute left-1/2 mt-3 -translate-x-1/2 rounded-xl border border-white/10 bg-black/70 backdrop-blur ${
-                        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                      className={`absolute left-1/2 mt-3 -translate-x-1/2 rounded-xl border border-white/10 bg-black/70 backdrop-blur shadow-[0_8px_24px_rgba(0,0,0,0.35)] transition-all duration-200 ${
+                        isOpen
+                          ? "pointer-events-auto opacity-100 translate-y-0"
+                          : "pointer-events-none opacity-0 -translate-y-1"
                       }`}
                     >
-                      <ul className="p-2">
+                      <ul className="p-2 whitespace-nowrap">
                         {m.dropdown!.map((d) => (
                           <li key={d.href}>
                             <Link
                               href={d.href}
-                              className="block rounded-lg px-4 py-2 text-[12px] text-white/90 hover:bg-white/10"
+                              className="block rounded-lg px-4 py-2 text-[12px] text-white/90 hover:bg-white/10 hover:text-white"
                             >
                               {d.label}
                             </Link>
@@ -174,20 +175,7 @@ export default function Nav() {
             })}
           </nav>
 
-          {/* LOGO */}
-          <div className="flex items-center justify-center">
-            <Link href="/">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/sight_only.png"
-                alt="Land Command"
-                className="h-14 w-auto md:h-[72px] transition-transform"
-                style={{ transform: `scale(${logoScale})` }}
-              />
-            </Link>
-          </div>
-
-          {/* RIGHT GROUP */}
+          {/* RIGHT group (aligned to left edge of column, near center) */}
           <nav className="flex items-center justify-start gap-12">
             {RIGHT_MENU.map((m) => (
               <Link
