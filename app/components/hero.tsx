@@ -16,34 +16,32 @@ export default function Hero() {
       />
       <div className="absolute inset-0 bg-black/40" />
 
-      {/* Logo + Business Name */}
-      <div className="relative z-10 flex flex-col items-center pt-36">
+      {/* Logo + Business Name + Tagline */}
+      <div className="relative z-10 flex flex-col items-center pt-36 text-center">
         <Image
           src="/sight_only.png"
           alt="Land Command"
-          width={130}
-          height={130}
+          width={140}
+          height={140}
           className="mb-3"
         />
         <h1 className="text-4xl md:text-5xl font-display tracking-wide text-[#EFECE0]">
           Land Command
         </h1>
-        <p className="mt-2 text-base md:text-lg font-medium text-white/90 tracking-wide uppercase">
+        <p className="mt-3 text-lg md:text-xl font-medium text-white/90 uppercase tracking-wide">
           America&apos;s Premiere Property Specialists
         </p>
       </div>
 
-      {/* Hero text */}
-      <div className="relative z-10 mx-auto mt-12 max-w-3xl px-6 text-center">
-        <div className="mb-6 inline-flex rounded-full border border-white/20 bg-black/40 px-6 py-2 text-sm tracking-[0.25em] text-white/90 backdrop-blur">
+      {/* Category pill */}
+      <div className="relative z-10 mx-auto mt-10 max-w-3xl px-6 text-center">
+        <div className="inline-flex rounded-full border border-white/20 bg-black/40 px-6 py-2 text-sm tracking-[0.25em] text-white/90 backdrop-blur">
           LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; EQUESTRIAN &nbsp; | &nbsp;
           ESTATE
         </div>
-        <h2 className="font-display text-2xl md:text-3xl font-semibold leading-snug text-white">
-          Bringing Exceptional Land Opportunities to Discerning Investors and
-          Legacy Builders
-        </h2>
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
+
+        {/* Buttons */}
+        <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
             href="/properties"
             className="rounded-xl border border-white/40 px-6 py-3 text-sm font-medium text-white hover:bg-white/10"
