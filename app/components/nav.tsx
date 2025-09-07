@@ -4,14 +4,13 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 /**
- * LandCommand Nav (clean baseline)
- * - Centered large logo
- * - LEFT: About (dropdown), Properties (dropdown)
- * - RIGHT: Search for Land, Short Films, Contact + hamburger (drawer)
- * - Inertia on scroll: delayed blur/tint + slight vertical drag
- * - No duplicates, no wrapping
+ * LandCommand – Covey Rise style header (mirrored layout)
+ * - Centered logo
+ * - Left: ABOUT LAND COMMAND (dropdown) / PROPERTIES (dropdown)
+ * - Right: SEARCH FOR LAND / SHORT FILMS / CONTACT / Hamburger drawer
+ * - Subtle glass/blur/tint + delayed scroll inertia + hover dropdowns
  *
- * Requires /public/sight_only.png
+ * Requires: /public/sight_only.png  (logo)
  */
 
 type MenuItem = {
@@ -23,146 +22,167 @@ type MenuItem = {
 const LEFT_MENU: MenuItem[] = [
   {
     href: "/about",
-    label: "About",
+    label: "ABOUT LAND COMMAND",
     dropdown: [
-      { href: "/about/firm", label: "The Firm" },
-      { href: "/about/process", label: "Process" },
+      { href: "/about/firm", label: "Our Firm" },
+      { href: "/about/process", label: "Our Process" },
       { href: "/about/press", label: "Press" },
+      { href: "/about/stories", label: "Stories" },
     ],
   },
   {
     href: "/properties",
-    label: "Properties",
+    label: "PROPERTIES",
     dropdown: [
-      { href: "/properties/available", label: "Available Listings" },
+      { href: "/properties/available", label: "Available" },
       { href: "/properties/under-contract", label: "Under Contract" },
       { href: "/properties/sold", label: "Sold" },
+      { href: "/sell", label: "List Your Property" },
     ],
   },
 ];
 
 const RIGHT_MENU: MenuItem[] = [
-  { href: "/search", label: "Search for Land" },
-  { href: "/short-films", label: "Short Films" },
-  { href: "/contact", label: "Contact" },
+  { href: "/search", label: "SEARCH FOR LAND" },
+  { href: "/short-films", label: "SHORT FILMS" },
+  { href: "/contact", label: "CONTACT" },
 ];
 
+// helpers
 const clamp = (n: number, min: number, max: number) =>
   Math.min(max, Math.max(min, n));
 
 export default function Nav() {
-  // Inertia / Drag (spring)
+  // delayed scroll / inertia
   const [progress, setProgress] = useState(0);
-  const [dragPx, setDragPx] = useState(0);
-  const targetRef = useRef(0);
-  const curRef = useRef(0);
-  const velRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
+  const [dragY, setDragY] = useState(0);
+  const target = useRef(0);
+  const cur = useRef(0);
+  const vel = useRef(0);
+  const raf = useRef<number | null>(null);
 
-  const STIFFNESS = 0.02;
-  const DAMPING = 0.1;
-  const MAXY = 200;
-  const DRAG_SCALE = 0.45;
+  const STIFF = 0.02;
+  const DAMP = 0.1;
+  const MAX = 200;
+  const DRAG = 0.45;
 
   useEffect(() => {
     const onScroll = () => {
-      targetRef.current = window.scrollY;
-      if (rafRef.current == null) animate();
+      target.current = window.scrollY;
+      if (raf.current == null) animate();
     };
     const animate = () => {
-      rafRef.current = requestAnimationFrame(animate);
-      const target = targetRef.current;
-      const x = curRef.current;
-      const v = velRef.current;
-      const force = STIFFNESS * (target - x) - DAMPING * v;
-      const nextV = v + force;
-      const nextX = x + nextV;
-      curRef.current = nextX;
-      velRef.current = nextV;
-      const p = clamp(nextX / MAXY, 0, 1);
-      setProgress(p);
-      setDragPx((nextX - target) * DRAG_SCALE);
-      if (Math.abs(nextX - target) < 0.1 && Math.abs(nextV) < 0.1) {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
+      raf.current = requestAnimationFrame(animate);
+      const x = cur.current;
+      const v = vel.current;
+      const t = target.current;
+      const force = STIFF * (t - x) - DAMP * v;
+      const nv = v + force;
+      const nx = x + nv;
+      cur.current = nx;
+      vel.current = nv;
+      setProgress(clamp(nx / MAX, 0, 1));
+      setDragY((nx - t) * DRAG);
+      if (Math.abs(nx - t) < 0.1 && Math.abs(nv) < 0.1) {
+        if (raf.current) cancelAnimationFrame(raf.current);
+        raf.current = null;
       }
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (raf.current) cancelAnimationFrame(raf.current);
     };
   }, []);
 
-  const blurPx = 12 * progress;
-  const tintA = 0.4 * progress;
-  const borderA = 0.12 * progress;
-  const shadowA = 0.32 * progress;
+  const blur = 12 * progress;
+  const tint = 0.4 * progress;
+  const border = 0.12 * progress;
+  const shadow = 0.32 * progress;
   const logoScale = 1 - 0.06 * progress;
 
-  // Dropdown state
+  // dropdowns
   const [openKey, setOpenKey] = useState<string | null>(null);
   const timers = useRef<Record<string, any>>({});
-  const openWithDelay = (k: string) => {
+  const openDelayed = (k: string) => {
     clearTimeout(timers.current[k]);
-    timers.current[k] = setTimeout(() => setOpenKey(k), 80);
+    timers.current[k] = setTimeout(() => setOpenKey(k), 90);
   };
-  const closeWithDelay = (k: string) => {
+  const closeDelayed = (k: string) => {
     clearTimeout(timers.current[k]);
     timers.current[k] = setTimeout(() => {
       if (openKey === k) setOpenKey(null);
     }, 120);
   };
 
-  // Drawer
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  // drawer
+  const [drawer, setDrawer] = useState(false);
+
+  // caret
+  const Caret = ({ open }: { open?: boolean }) => (
+    <span
+      className={`ml-2 inline-block transition-transform duration-200 ${
+        open ? "rotate-180" : ""
+      }`}
+      aria-hidden
+    >
+      ▾
+    </span>
+  );
 
   return (
     <header className="pointer-events-none absolute inset-x-0 top-0 z-50">
       <div
-        className="mx-auto w-full max-w-6xl px-6 transition-[padding,transform] duration-300"
+        className="mx-auto w-full max-w-[1200px] px-8 transition-[transform,background-color,backdrop-filter] duration-300"
         style={{
           pointerEvents: "auto",
-          transform: `translateY(${dragPx}px)`,
-          backdropFilter: `blur(${blurPx}px)`,
-          WebkitBackdropFilter: `blur(${blurPx}px)`,
-          backgroundColor: `rgba(0,0,0,${tintA})`,
-          boxShadow: `0 8px 24px rgba(0,0,0,${shadowA})`,
-          borderBottom: `1px solid rgba(255,255,255,${borderA})`,
+          transform: `translateY(${dragY}px)`,
+          backdropFilter: `blur(${blur}px)`,
+          WebkitBackdropFilter: `blur(${blur}px)`,
+          backgroundColor: `rgba(0,0,0,${tint})`,
+          boxShadow: `0 8px 24px rgba(0,0,0,${shadow})`,
+          borderBottom: `1px solid rgba(255,255,255,${border})`,
         }}
       >
-        {/* 3 columns: left menu | centered logo | right menu + burger */}
-        <div className="relative grid grid-cols-3 items-center py-6">
-          {/* LEFT */}
-          <nav className="hidden md:flex items-center justify-end gap-10">
-            {LEFT_MENU.map((item) => {
-              const isOpen = openKey === item.label;
+        {/* three columns: left group | centered logo | right group */}
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center py-6">
+          {/* LEFT GROUP */}
+          <nav className="hidden md:flex items-center justify-start gap-12">
+            {LEFT_MENU.map((m) => {
+              const isOpen = openKey === m.label;
+              const hasDrop = !!m.dropdown;
               return (
                 <div
-                  key={item.label}
+                  key={m.label}
                   className="relative"
-                  onMouseEnter={() => openWithDelay(item.label)}
-                  onMouseLeave={() => closeWithDelay(item.label)}
+                  onMouseEnter={() => hasDrop && openDelayed(m.label)}
+                  onMouseLeave={() => hasDrop && closeDelayed(m.label)}
                 >
                   <Link
-                    href={item.href}
-                    className="relative text-[12px] uppercase tracking-[0.16em] whitespace-nowrap text-white/90 hover:text-white
-                               after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-white/80 after:transition-all hover:after:w-full"
+                    href={m.href}
+                    className="relative text-[13px] uppercase tracking-[0.16em] whitespace-nowrap text-white/90 hover:text-white"
                   >
-                    {item.label}
+                    {m.label}
+                    {hasDrop && <Caret open={isOpen} />}
+                    <span className="absolute left-0 -bottom-1 block h-px w-0 bg-white/80 transition-all duration-200 group-hover:w-full" />
                   </Link>
-                  {item.dropdown && (
+
+                  {hasDrop && (
                     <div
                       className={`absolute left-1/2 z-50 mt-3 -translate-x-1/2 rounded-xl border border-white/10 bg-black/70 backdrop-blur shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                                  transition-all duration-200 ${isOpen ? "pointer-events-auto opacity-100 translate-y-0" : "pointer-events-none opacity-0 -translate-y-1"}`}
+                      transition-all duration-200 ${
+                        isOpen
+                          ? "pointer-events-auto opacity-100 translate-y-0"
+                          : "pointer-events-none opacity-0 -translate-y-1"
+                      }`}
                     >
                       <ul className="p-2 whitespace-nowrap">
-                        {item.dropdown.map((d) => (
+                        {m.dropdown!.map((d) => (
                           <li key={d.href}>
                             <Link
                               href={d.href}
-                              className="block rounded-lg px-3 py-2 text-[12px] text-white/90 hover:bg-white/10 hover:text-white"
+                              className="block rounded-lg px-4 py-2 text-[12px] text-white/90 hover:bg-white/10 hover:text-white"
                             >
                               {d.label}
                             </Link>
@@ -176,30 +196,30 @@ export default function Nav() {
             })}
           </nav>
 
-          {/* CENTER LOGO */}
-          <div className="flex justify-center">
+          {/* CENTERED LOGO */}
+          <div className="flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <Link href="/" className="inline-flex">
               <img
                 src="/sight_only.png"
-                alt="LandCommand.ai"
+                alt="Land Command"
+                className="h-14 w-auto md:h-[72px] lg:h-[78px] transition-transform duration-300 will-change-transform"
                 style={{ transform: `scale(${logoScale})` }}
-                className="h-16 w-auto md:h-20 lg:h-24 will-change-transform transition-transform duration-300"
               />
             </Link>
           </div>
 
-          {/* RIGHT */}
-          <div className="flex items-center justify-start gap-10">
-            <nav className="hidden md:flex items-center gap-10">
-              {RIGHT_MENU.map((item) => (
+          {/* RIGHT GROUP */}
+          <div className="flex items-center justify-end gap-12">
+            <nav className="hidden md:flex items-center gap-12">
+              {RIGHT_MENU.map((m) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  className="relative text-[12px] uppercase tracking-[0.16em] whitespace-nowrap text-white/90 hover:text-white
-                             after:absolute after:right-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-white/80 after:transition-all hover:after:w-full"
+                  key={m.href}
+                  href={m.href}
+                  className="relative text-[13px] uppercase tracking-[0.16em] whitespace-nowrap text-white/90 hover:text-white"
                 >
-                  {item.label}
+                  {m.label}
+                  <span className="absolute right-0 -bottom-1 block h-px w-0 bg-white/80 transition-all duration-200 hover:w-full" />
                 </Link>
               ))}
             </nav>
@@ -207,43 +227,41 @@ export default function Nav() {
             {/* Hamburger */}
             <button
               aria-label="Open menu"
-              aria-expanded={drawerOpen}
-              aria-controls="site-drawer"
-              onClick={() => setDrawerOpen(true)}
-              className="ml-2 inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 backdrop-blur text-white/90 hover:bg-white/10"
+              aria-expanded={drawer}
+              onClick={() => setDrawer(true)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/25 bg-black/30 backdrop-blur text-white/90 hover:bg-white/10"
             >
               <span className="sr-only">Open menu</span>
-              <span className="block h-0.5 w-5 bg-white" />
-              <span className="mt-1 block h-0.5 w-5 bg-white" />
-              <span className="mt-1 block h-0.5 w-5 bg-white" />
+              <span className="block h-0.5 w-6 bg-white" />
+              <span className="mt-1.5 block h-0.5 w-6 bg-white" />
+              <span className="mt-1.5 block h-0.5 w-6 bg-white" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* RIGHT-SIDE DRAWER */}
+      {/* RIGHT DRAWER */}
       <div
-        className={`fixed inset-0 z-[60] ${drawerOpen ? "pointer-events-auto" : "pointer-events-none"}`}
-        aria-hidden={!drawerOpen}
+        className={`fixed inset-0 z-[60] ${drawer ? "pointer-events-auto" : "pointer-events-none"}`}
+        aria-hidden={!drawer}
       >
-        {/* Backdrop */}
         <div
-          className={`absolute inset-0 transition-opacity duration-200 ${drawerOpen ? "opacity-100" : "opacity-0"}`}
-          onClick={() => setDrawerOpen(false)}
+          className={`absolute inset-0 transition-opacity duration-200 ${drawer ? "opacity-100" : "opacity-0"}`}
+          onClick={() => setDrawer(false)}
           style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
         />
-        {/* Panel */}
         <aside
-          id="site-drawer"
-          className={`absolute right-0 top-0 h-full w-[90vw] max-w-[420px] transform transition-transform duration-200 ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}
+          className={`absolute right-0 top-0 h-full w-[90vw] max-w-[420px] transform transition-transform duration-200 ${
+            drawer ? "translate-x-0" : "translate-x-full"
+          }`}
         >
-          <div className="flex h-full flex-col gap-4 border-l border-white/10 bg-black/70 p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur">
+          <div className="flex h-full flex-col gap-5 border-l border-white/10 bg-black/70 p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur">
             <div className="flex items-center justify-between">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/sight_only.png" alt="LandCommand.ai" className="h-8 w-auto" />
+              <img src="/sight_only.png" alt="Land Command" className="h-8 w-auto" />
               <button
                 aria-label="Close menu"
-                onClick={() => setDrawerOpen(false)}
+                onClick={() => setDrawer(false)}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 text-white/90 hover:bg-white/10"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
@@ -252,34 +270,35 @@ export default function Nav() {
               </button>
             </div>
 
-            <div className="mt-2 grid gap-8">
+            <div className="grid gap-6">
               <div>
                 <p className="mb-2 text-xs uppercase tracking-[0.16em] text-white/60">Navigate</p>
                 <ul className="space-y-1">
-                  <li><Link href="/about" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">About</Link></li>
-                  <li><Link href="/properties" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Properties</Link></li>
-                  <li><Link href="/search" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Search for Land</Link></li>
-                  <li><Link href="/short-films" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Short Films</Link></li>
-                  <li><Link href="/contact" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Contact</Link></li>
+                  <li><Link href="/about" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">About Land Command</Link></li>
+                  <li><Link href="/properties" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Properties</Link></li>
+                  <li><Link href="/search" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Search for Land</Link></li>
+                  <li><Link href="/short-films" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Short Films</Link></li>
+                  <li><Link href="/contact" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Contact</Link></li>
                 </ul>
               </div>
 
               <div>
                 <p className="mb-2 text-xs uppercase tracking-[0.16em] text-white/60">Status</p>
                 <ul className="space-y-1">
-                  <li><Link href="/properties/available" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Available Listings</Link></li>
-                  <li><Link href="/properties/under-contract" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Under Contract</Link></li>
-                  <li><Link href="/properties/sold" onClick={() => setDrawerOpen(false)} className="block rounded-lg px-3 py-2 text-white/90 hover:bg-white/10">Sold</Link></li>
+                  <li><Link href="/properties/available" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Available</Link></li>
+                  <li><Link href="/properties/under-contract" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Under Contract</Link></li>
+                  <li><Link href="/properties/sold" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Sold</Link></li>
                 </ul>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-1">
                 <Link
-                  href="/contact"
-                  onClick={() => setDrawerOpen(false)}
-                  className="inline-flex w-full items-center justify-center rounded-xl border border-white/70 px-6 py-3 font-medium text-white hover:bg-white/10"
+                  href="/sell"
+                  onClick={() => setDrawer(false)}
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
+                  style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.25) inset" }}
                 >
-                  Speak with a Specialist
+                  List Your Property
                 </Link>
               </div>
             </div>
