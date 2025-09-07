@@ -3,16 +3,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-/**
- * LandCommand – Covey Rise style header (mirrored layout)
- * - Centered logo
- * - Left: ABOUT LAND COMMAND (dropdown) / PROPERTIES (dropdown)
- * - Right: SEARCH FOR LAND / SHORT FILMS / CONTACT / Hamburger drawer
- * - Subtle glass/blur/tint + delayed scroll inertia + hover dropdowns
- *
- * Requires: /public/sight_only.png  (logo)
- */
-
 type MenuItem = {
   href: string;
   label: string;
@@ -45,15 +35,12 @@ const LEFT_MENU: MenuItem[] = [
 const RIGHT_MENU: MenuItem[] = [
   { href: "/search", label: "SEARCH FOR LAND" },
   { href: "/short-films", label: "SHORT FILMS" },
-  { href: "/contact", label: "CONTACT" },
 ];
 
-// helpers
 const clamp = (n: number, min: number, max: number) =>
   Math.min(max, Math.max(min, n));
 
 export default function Nav() {
-  // delayed scroll / inertia
   const [progress, setProgress] = useState(0);
   const [dragY, setDragY] = useState(0);
   const target = useRef(0);
@@ -102,7 +89,6 @@ export default function Nav() {
   const shadow = 0.32 * progress;
   const logoScale = 1 - 0.06 * progress;
 
-  // dropdowns
   const [openKey, setOpenKey] = useState<string | null>(null);
   const timers = useRef<Record<string, any>>({});
   const openDelayed = (k: string) => {
@@ -116,16 +102,13 @@ export default function Nav() {
     }, 120);
   };
 
-  // drawer
   const [drawer, setDrawer] = useState(false);
 
-  // caret
   const Caret = ({ open }: { open?: boolean }) => (
     <span
       className={`ml-2 inline-block transition-transform duration-200 ${
         open ? "rotate-180" : ""
       }`}
-      aria-hidden
     >
       ▾
     </span>
@@ -148,7 +131,7 @@ export default function Nav() {
         {/* three columns: left group | centered logo | right group */}
         <div className="grid grid-cols-[1fr_auto_1fr] items-center py-6">
           {/* LEFT GROUP */}
-          <nav className="hidden md:flex items-center justify-start gap-12">
+          <nav className="flex items-center justify-end gap-12">
             {LEFT_MENU.map((m) => {
               const isOpen = openKey === m.label;
               const hasDrop = !!m.dropdown;
@@ -161,28 +144,23 @@ export default function Nav() {
                 >
                   <Link
                     href={m.href}
-                    className="relative text-[13px] uppercase tracking-[0.16em] whitespace-nowrap text-white/90 hover:text-white"
+                    className="relative text-[13px] uppercase tracking-[0.16em] text-white/90 hover:text-white"
                   >
                     {m.label}
                     {hasDrop && <Caret open={isOpen} />}
-                    <span className="absolute left-0 -bottom-1 block h-px w-0 bg-white/80 transition-all duration-200 group-hover:w-full" />
                   </Link>
-
                   {hasDrop && (
                     <div
-                      className={`absolute left-1/2 z-50 mt-3 -translate-x-1/2 rounded-xl border border-white/10 bg-black/70 backdrop-blur shadow-[0_8px_24px_rgba(0,0,0,0.35)]
-                      transition-all duration-200 ${
-                        isOpen
-                          ? "pointer-events-auto opacity-100 translate-y-0"
-                          : "pointer-events-none opacity-0 -translate-y-1"
+                      className={`absolute left-1/2 mt-3 -translate-x-1/2 rounded-xl border border-white/10 bg-black/70 backdrop-blur ${
+                        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                       }`}
                     >
-                      <ul className="p-2 whitespace-nowrap">
+                      <ul className="p-2">
                         {m.dropdown!.map((d) => (
                           <li key={d.href}>
                             <Link
                               href={d.href}
-                              className="block rounded-lg px-4 py-2 text-[12px] text-white/90 hover:bg-white/10 hover:text-white"
+                              className="block rounded-lg px-4 py-2 text-[12px] text-white/90 hover:bg-white/10"
                             >
                               {d.label}
                             </Link>
@@ -196,118 +174,32 @@ export default function Nav() {
             })}
           </nav>
 
-          {/* CENTERED LOGO */}
+          {/* LOGO */}
           <div className="flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <Link href="/" className="inline-flex">
+            <Link href="/">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/sight_only.png"
                 alt="Land Command"
-                className="h-14 w-auto md:h-[72px] lg:h-[78px] transition-transform duration-300 will-change-transform"
+                className="h-14 w-auto md:h-[72px] transition-transform"
                 style={{ transform: `scale(${logoScale})` }}
               />
             </Link>
           </div>
 
           {/* RIGHT GROUP */}
-          <div className="flex items-center justify-end gap-12">
-            <nav className="hidden md:flex items-center gap-12">
-              {RIGHT_MENU.map((m) => (
-                <Link
-                  key={m.href}
-                  href={m.href}
-                  className="relative text-[13px] uppercase tracking-[0.16em] whitespace-nowrap text-white/90 hover:text-white"
-                >
-                  {m.label}
-                  <span className="absolute right-0 -bottom-1 block h-px w-0 bg-white/80 transition-all duration-200 hover:w-full" />
-                </Link>
-              ))}
-            </nav>
-
-            {/* Hamburger */}
-            <button
-              aria-label="Open menu"
-              aria-expanded={drawer}
-              onClick={() => setDrawer(true)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/25 bg-black/30 backdrop-blur text-white/90 hover:bg-white/10"
-            >
-              <span className="sr-only">Open menu</span>
-              <span className="block h-0.5 w-6 bg-white" />
-              <span className="mt-1.5 block h-0.5 w-6 bg-white" />
-              <span className="mt-1.5 block h-0.5 w-6 bg-white" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* RIGHT DRAWER */}
-      <div
-        className={`fixed inset-0 z-[60] ${drawer ? "pointer-events-auto" : "pointer-events-none"}`}
-        aria-hidden={!drawer}
-      >
-        <div
-          className={`absolute inset-0 transition-opacity duration-200 ${drawer ? "opacity-100" : "opacity-0"}`}
-          onClick={() => setDrawer(false)}
-          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
-        />
-        <aside
-          className={`absolute right-0 top-0 h-full w-[90vw] max-w-[420px] transform transition-transform duration-200 ${
-            drawer ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <div className="flex h-full flex-col gap-5 border-l border-white/10 bg-black/70 p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur">
-            <div className="flex items-center justify-between">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/sight_only.png" alt="Land Command" className="h-8 w-auto" />
-              <button
-                aria-label="Close menu"
-                onClick={() => setDrawer(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/20 bg-black/30 text-white/90 hover:bg-white/10"
+          <nav className="flex items-center justify-start gap-12">
+            {RIGHT_MENU.map((m) => (
+              <Link
+                key={m.href}
+                href={m.href}
+                className="relative text-[13px] uppercase tracking-[0.16em] text-white/90 hover:text-white"
               >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 6l12 12M18 6l-12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="grid gap-6">
-              <div>
-                <p className="mb-2 text-xs uppercase tracking-[0.16em] text-white/60">Navigate</p>
-                <ul className="space-y-1">
-                  <li><Link href="/about" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">About Land Command</Link></li>
-                  <li><Link href="/properties" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Properties</Link></li>
-                  <li><Link href="/search" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Search for Land</Link></li>
-                  <li><Link href="/short-films" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Short Films</Link></li>
-                  <li><Link href="/contact" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Contact</Link></li>
-                </ul>
-              </div>
-
-              <div>
-                <p className="mb-2 text-xs uppercase tracking-[0.16em] text-white/60">Status</p>
-                <ul className="space-y-1">
-                  <li><Link href="/properties/available" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Available</Link></li>
-                  <li><Link href="/properties/under-contract" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Under Contract</Link></li>
-                  <li><Link href="/properties/sold" onClick={() => setDrawer(false)} className="block rounded-lg px-3 py-2 hover:bg-white/10">Sold</Link></li>
-                </ul>
-              </div>
-
-              <div className="pt-1">
-                <Link
-                  href="/sell"
-                  onClick={() => setDrawer(false)}
-                  className="inline-flex w-full items-center justify-center rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
-                  style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.25) inset" }}
-                >
-                  List Your Property
-                </Link>
-              </div>
-            </div>
-
-            <div className="mt-auto text-center text-xs text-white/60">
-              © {new Date().getFullYear()} LandCommand.ai
-            </div>
-          </div>
-        </aside>
+                {m.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </div>
     </header>
   );
