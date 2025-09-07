@@ -17,7 +17,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/40" />
 
       {/* Logo + Business Name + Tagline */}
-      <div className="relative z-10 flex flex-col items-center pt-36 text-center">
+      <div className="relative z-10 flex flex-col items-center pt-20 text-center">
         <Image
           src="/sight_only.png"
           alt="Land Command"
