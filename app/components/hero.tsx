@@ -34,9 +34,7 @@ export default function Hero() {
 
           {/* Tagline */}
           <h1 className="mx-auto max-w-4xl font-serif text-[28px] md:text-[34px] leading-snug font-semibold text-white">
-            Middle Tennessee&apos;s Premier Property Specialists, Bringing
-            Exceptional Land Opportunities to Discerning Investors and Legacy
-            Builders
+            America's Premier Property Specialists
           </h1>
 
           {/* CTAs (gold primary, ivory outline) */}
