@@ -1,31 +1,29 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss";
+
+const config: Config = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-    "./lib/**/*.{js,ts,jsx,tsx}",
-    "./styles/**/*.{css}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",       // all route files
+    "./components/**/*.{js,ts,jsx,tsx,mdx}", // shared components
+    "./styles/**/*.css",                     // ✅ fixed glob pattern
   ],
   theme: {
     extend: {
       colors: {
-        brand: {
-          charcoal: "#1B1B1B", // page background / hero base
-          linen: "#EFECE0",    // warm ivory text
-          green: "#2F4F4F",    // deep forest accent (links, subtle accents)
+        charcoal: "#1B1B1B",
+        ivory: "#EFECE0",
+        gold: {
+          DEFAULT: "#CBB26A",
+          light: "rgba(203,178,106,0.9)",
+          border: "rgba(203,178,106,0.75)",
         },
       },
       fontFamily: {
-        display: ["var(--font-display)", "ui-serif", "Georgia", "serif"],
-        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
-      },
-      letterSpacing: {
-        nav: ".24em", // thin uppercase tracking
-      },
-      boxShadow: {
-        card: "0 8px 24px rgba(0,0,0,0.25)",
+        sans: ["var(--font-sans)", "sans-serif"],
+        display: ["var(--font-display)", "serif"],
       },
     },
   },
   plugins: [],
 };
+
+export default config;
