@@ -1,60 +1,64 @@
-// app/components/hero.tsx
 "use client";
+
+import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="relative isolate overflow-hidden">
-      {/* Background video (full-bleed) */}
-      <div className="absolute inset-0 -z-10">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="h-full w-full object-cover"
-          src="/hero.mp4"
+    <section className="relative isolate min-h-screen w-full overflow-hidden">
+      {/* Background video */}
+      <video
+        src="/hero.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/40" />
+
+      {/* Logo + Business Name */}
+      <div className="relative z-10 flex flex-col items-center pt-40">
+        <Image
+          src="/sight_only.png"
+          alt="Land Command"
+          width={120}
+          height={120}
+          className="mb-3"
         />
-        {/* darken for legibility */}
-        <div className="absolute inset-0 bg-black/40" />
-        {/* fade into charcoal at bottom */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
+        <h1 className="text-4xl md:text-5xl font-display tracking-wide text-[#EFECE0]">
+          Land Command
+        </h1>
       </div>
 
-      {/* Overlay content (centered) */}
-      <div className="relative flex min-h-[82vh] items-center justify-center text-center px-6">
-        <div className="space-y-6">
-          {/* Pill */}
-          <div className="inline-flex items-center justify-center rounded-full border border-white/20 bg-black/30 px-6 py-2 backdrop-blur shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
-            <p className="text-[12px] uppercase tracking-[0.24em] text-white/90">
-              Land <span className="px-3 text-white/50">|</span> Farm{" "}
-              <span className="px-3 text-white/50">|</span> Equestrian{" "}
-              <span className="px-3 text-white/50">|</span> Estate
-            </p>
-          </div>
-
-          {/* Tagline */}
-          <h1 className="mx-auto max-w-4xl font-serif text-[28px] md:text-[34px] leading-snug font-semibold text-white">
-            America's Premier Property Specialists
-          </h1>
-
-          {/* CTAs (gold primary, ivory outline) */}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="/properties"
-              className="inline-flex items-center rounded-md border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
-              style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.25) inset" }}
-            >
-              Exclusive Properties
-            </a>
-            <a
-              href="/contact"
-              className="inline-flex items-center rounded-md border border-[rgba(239,236,224,0.6)] bg-transparent px-6 py-3 font-medium text-[rgba(239,236,224,1)] hover:bg-[rgba(239,236,224,0.08)]"
-            >
-              Speak with a Specialist
-            </a>
-          </div>
+      {/* Hero text */}
+      <div className="relative z-10 mx-auto mt-12 max-w-3xl px-6 text-center">
+        <div className="mb-6 inline-flex rounded-full border border-white/20 bg-black/40 px-6 py-2 text-sm tracking-[0.25em] text-white/90 backdrop-blur">
+          LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; EQUESTRIAN &nbsp; | &nbsp;
+          ESTATE
+        </div>
+        <h2 className="font-display text-2xl md:text-3xl font-semibold leading-snug text-white">
+          Middle Tennessee&apos;s Premier Property Specialists, Bringing
+          Exceptional Land Opportunities to Discerning Investors and Legacy
+          Builders
+        </h2>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <a
+            href="/properties"
+            className="rounded-xl border border-white/40 px-6 py-3 text-sm font-medium text-white hover:bg-white/10"
+          >
+            Exclusive Properties
+          </a>
+          <a
+            href="/contact"
+            className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
+          >
+            Speak with a Specialist
+          </a>
         </div>
       </div>
+
+      {/* Fade bottom overlay */}
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
     </section>
   );
 }
