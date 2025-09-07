@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
  * - LEFT: About (dropdown), Properties (dropdown)
  * - RIGHT: Search for Land, Short Films, Contact + hamburger (drawer)
  * - Inertia on scroll: delayed blur/tint + slight vertical drag
- * - No duplicate renders, no wrapping
+ * - No duplicates, no wrapping
  *
  * Requires /public/sight_only.png
  */
@@ -47,23 +47,20 @@ const RIGHT_MENU: MenuItem[] = [
   { href: "/contact", label: "Contact" },
 ];
 
-// util
 const clamp = (n: number, min: number, max: number) =>
   Math.min(max, Math.max(min, n));
 
 export default function Nav() {
-  /* ---------- Inertia / Drag (spring) ---------- */
-  const [progress, setProgress] = useState(0); // 0..1
+  // Inertia / Drag (spring)
+  const [progress, setProgress] = useState(0);
   const [dragPx, setDragPx] = useState(0);
-
   const targetRef = useRef(0);
   const curRef = useRef(0);
   const velRef = useRef(0);
   const rafRef = useRef<number | null>(null);
 
-  // tuned for visible lag
   const STIFFNESS = 0.02;
-  const DAMPING = 0.10;
+  const DAMPING = 0.1;
   const MAXY = 200;
   const DRAG_SCALE = 0.45;
 
@@ -77,24 +74,19 @@ export default function Nav() {
       const target = targetRef.current;
       const x = curRef.current;
       const v = velRef.current;
-
       const force = STIFFNESS * (target - x) - DAMPING * v;
       const nextV = v + force;
       const nextX = x + nextV;
-
       curRef.current = nextX;
       velRef.current = nextV;
-
       const p = clamp(nextX / MAXY, 0, 1);
       setProgress(p);
       setDragPx((nextX - target) * DRAG_SCALE);
-
       if (Math.abs(nextX - target) < 0.1 && Math.abs(nextV) < 0.1) {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
     };
-
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
@@ -103,14 +95,13 @@ export default function Nav() {
     };
   }, []);
 
-  // map to styles
   const blurPx = 12 * progress;
   const tintA = 0.4 * progress;
   const borderA = 0.12 * progress;
   const shadowA = 0.32 * progress;
   const logoScale = 1 - 0.06 * progress;
 
-  /* ---------- Dropdown state ---------- */
+  // Dropdown state
   const [openKey, setOpenKey] = useState<string | null>(null);
   const timers = useRef<Record<string, any>>({});
   const openWithDelay = (k: string) => {
@@ -124,16 +115,9 @@ export default function Nav() {
     }, 120);
   };
 
-  /* ---------- Drawer ---------- */
+  // Drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
-  useEffect(() => {
-    if (!drawerOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDrawerOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [drawerOpen]);
 
-  /* ---------- Render ---------- */
   return (
     <header className="pointer-events-none absolute inset-x-0 top-0 z-50">
       <div
@@ -168,7 +152,6 @@ export default function Nav() {
                   >
                     {item.label}
                   </Link>
-
                   {item.dropdown && (
                     <div
                       className={`absolute left-1/2 z-50 mt-3 -translate-x-1/2 rounded-xl border border-white/10 bg-black/70 backdrop-blur shadow-[0_8px_24px_rgba(0,0,0,0.35)]
@@ -310,4 +293,3 @@ export default function Nav() {
     </header>
   );
 }
-
