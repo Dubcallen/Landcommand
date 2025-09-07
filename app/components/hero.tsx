@@ -1,6 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { Playfair_Display } from "next/font/google";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-playfair",
+});
 
 export default function Hero() {
   return (
@@ -25,11 +32,13 @@ export default function Hero() {
           height={140}
           className="mb-3"
         />
-        <h1 className="text-4xl md:text-5xl font-display tracking-wide text-[#EFECE0]">
+        <h1
+          className={`${playfair.className} text-5xl md:text-6xl tracking-wide text-[#EFECE0] uppercase`}
+        >
           Land Command
         </h1>
         <p className="mt-3 text-lg md:text-xl font-medium text-white/90 uppercase tracking-wide">
-          America&apos;s Premiere Property Specialists
+          America&apos;s Premiere Land Specialists
         </p>
       </div>
 
@@ -46,7 +55,7 @@ export default function Hero() {
             href="/properties"
             className="rounded-xl border border-white/40 px-6 py-3 text-sm font-medium text-white hover:bg-white/10"
           >
-            Exclusive Properties
+            Exclusive Land
           </a>
           <a
             href="/contact"
