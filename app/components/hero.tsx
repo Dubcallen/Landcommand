@@ -17,17 +17,20 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/40" />
 
       {/* Logo + Business Name */}
-      <div className="relative z-10 flex flex-col items-center pt-40">
+      <div className="relative z-10 flex flex-col items-center pt-36">
         <Image
           src="/sight_only.png"
           alt="Land Command"
-          width={120}
-          height={120}
+          width={130}
+          height={130}
           className="mb-3"
         />
         <h1 className="text-4xl md:text-5xl font-display tracking-wide text-[#EFECE0]">
           Land Command
         </h1>
+        <p className="mt-2 text-base md:text-lg font-medium text-white/90 tracking-wide uppercase">
+          America&apos;s Premiere Property Specialists
+        </p>
       </div>
 
       {/* Hero text */}
@@ -37,9 +40,8 @@ export default function Hero() {
           ESTATE
         </div>
         <h2 className="font-display text-2xl md:text-3xl font-semibold leading-snug text-white">
-          Middle Tennessee&apos;s Premier Property Specialists, Bringing
-          Exceptional Land Opportunities to Discerning Investors and Legacy
-          Builders
+          Bringing Exceptional Land Opportunities to Discerning Investors and
+          Legacy Builders
         </h2>
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <a
