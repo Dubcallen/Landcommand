@@ -25,9 +25,10 @@ export default function Hero() {
           height={140}
           className="mb-4"
         />
-        <h1 className="font-serif text-5xl md:text-6xl tracking-wide text-ivory">
-          LAND COMMAND
-        </h1>
+      <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em] text-ivory">
+  LAND COMMAND
+</h1>
+
         <p className="mt-3 text-lg md:text-xl font-sans text-gray-200 uppercase tracking-wide">
           America&apos;s Premiere Land Specialists
         </p>
