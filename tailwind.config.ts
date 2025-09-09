@@ -2,24 +2,21 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",       // all route files
-    "./components/**/*.{js,ts,jsx,tsx,mdx}", // shared components
-    "./styles/**/*.css",                     // ✅ fixed glob pattern
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
-      colors: {
-        charcoal: "#1B1B1B",
-        ivory: "#EFECE0",
-        gold: {
-          DEFAULT: "#CBB26A",
-          light: "rgba(203,178,106,0.9)",
-          border: "rgba(203,178,106,0.75)",
-        },
-      },
       fontFamily: {
-        sans: ["var(--font-sans)", "sans-serif"],
-        display: ["var(--font-display)", "serif"],
+        sans: ["var(--font-sans)", "sans-serif"], // Inter
+        serif: ["var(--font-serif)", "serif"],   // Playfair Display
+      },
+      colors: {
+        ivory: "#EFECE0",
+        charcoal: "#1B1B1B",
+        forest: "#2E4E3F",
+        gold: "#CBB26A",
       },
     },
   },
