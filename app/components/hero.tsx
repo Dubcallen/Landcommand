@@ -25,18 +25,18 @@ export default function Hero() {
           height={140}
           className="mb-4"
         />
-      <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em] text-ivory">
-  LAND COMMAND
-</h1>
-
-        <p className="mt-3 text-lg md:text-xl font-sans text-gray-200 uppercase tracking-wide">
+        {/* Playfair Display 400 with tighter tracking for a thinner, elegant feel */}
+        <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em] text-[#EFECE0]">
+          LAND COMMAND
+        </h1>
+        <p className="mt-3 text-lg md:text-xl font-sans text-white/90 uppercase tracking-wide">
           America&apos;s Premiere Land Specialists
         </p>
       </div>
 
-      {/* Category pill */}
+      {/* Category line + subcopy + buttons */}
       <div className="relative z-10 mx-auto mt-10 max-w-3xl px-6 text-center">
-        <h2 className="font-serif text-3xl md:text-4xl tracking-wide text-ivory">
+        <h2 className="font-serif text-3xl md:text-4xl tracking-wide text-[#EFECE0]">
           LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; EQUESTRIAN &nbsp; | &nbsp; ESTATE
         </h2>
         <p className="mt-6 font-sans text-base md:text-lg text-gray-200">
@@ -44,7 +44,6 @@ export default function Hero() {
           Opportunities to Discerning Investors and Legacy Builders
         </p>
 
-        {/* Buttons */}
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
             href="/properties"
@@ -61,8 +60,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Fade bottom overlay */}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-charcoal" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
     </section>
   );
 }
