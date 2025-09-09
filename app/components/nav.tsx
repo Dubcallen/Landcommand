@@ -3,9 +3,20 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * Desktop:
+ * - Symmetric layout: LEFT group | spacer | RIGHT group
+ * - Hover dropdowns
+ * Mobile:
+ * - Hamburger (right)
+ * - Full-screen slide-in menu with accordions
+ * Extras:
+ * - Subtle inertia/drag on scroll (like Covey Rise)
+ * - No logo rendered in the nav (hero owns branding)
+ */
+
 type DD = { href: string; label: string };
 
-// Dropdown data
 const ABOUT_DD: DD[] = [
   { href: "/about", label: "Our Story" },
   { href: "/about/stories", label: "Featured Stories" },
@@ -25,12 +36,11 @@ const SERVICES_DD: DD[] = [
   { href: "/services/seller-financing", label: "Seller Financing" },
 ];
 
-// springy scroll helpers
-const clamp = (n: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, n));
+// small physics loop for the “drag” effect
+const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, n));
 
 export default function Nav() {
-  // inertia scroll state
+  // inertia
   const [progress, setProgress] = useState(0);
   const [dragY, setDragY] = useState(0);
   const target = useRef(0);
@@ -38,10 +48,10 @@ export default function Nav() {
   const vel = useRef(0);
   const raf = useRef<number | null>(null);
 
-  // mobile
+  // mobile open/close
   const [open, setOpen] = useState(false);
 
-  // delayed scroll parameters (subtle)
+  // tune these for “feel”
   const STIFF = 0.02;
   const DAMP = 0.10;
   const MAX = 180;
@@ -62,13 +72,16 @@ export default function Nav() {
       const nx = x + nv;
       cur.current = nx;
       vel.current = nv;
+
       setProgress(clamp(nx / MAX, 0, 1));
       setDragY((nx - t) * DRAG);
+
       if (Math.abs(nx - t) < 0.1 && Math.abs(nv) < 0.1) {
         if (raf.current) cancelAnimationFrame(raf.current);
         raf.current = null;
       }
     };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
@@ -77,30 +90,32 @@ export default function Nav() {
     };
   }, []);
 
-  // style values driven by scroll
+  // style driven by scroll
   const blur = 12 * progress;
-  const tint = 0.40 * progress; // darkens slightly while scrolling
+  const tint = 0.40 * progress;
   const border = 0.10 * progress;
   const shadow = 0.28 * progress;
 
-  // when mobile overlay is open, lock scroll
+  // lock scroll when mobile is open
   useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
     if (open) {
-      document.documentElement.classList.add("overflow-hidden");
-      document.body.classList.add("overflow-hidden");
+      root.classList.add("overflow-hidden");
+      body.classList.add("overflow-hidden");
     } else {
-      document.documentElement.classList.remove("overflow-hidden");
-      document.body.classList.remove("overflow-hidden");
+      root.classList.remove("overflow-hidden");
+      body.classList.remove("overflow-hidden");
     }
     return () => {
-      document.documentElement.classList.remove("overflow-hidden");
-      document.body.classList.remove("overflow-hidden");
+      root.classList.remove("overflow-hidden");
+      body.classList.remove("overflow-hidden");
     };
   }, [open]);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      {/* BAR */}
+      {/* bar */}
       <div
         className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 transition-[transform,background-color,backdrop-filter] duration-300"
         style={{
@@ -108,8 +123,8 @@ export default function Nav() {
           backdropFilter: `blur(${blur}px)`,
           WebkitBackdropFilter: `blur(${blur}px)`,
           backgroundColor: `rgba(0,0,0,${tint})`,
-          boxShadow: `0 8px 24px rgba(0,0,0,${shadow})`,
           borderBottom: `1px solid rgba(255,255,255,${border})`,
+          boxShadow: `0 8px 24px rgba(0,0,0,${shadow})`,
         }}
       >
         <div className="grid grid-cols-[1fr_auto_1fr] items-center py-4">
@@ -120,7 +135,7 @@ export default function Nav() {
             <DesktopDropdown label="SERVICES" items={SERVICES_DD} />
           </div>
 
-          {/* CENTER spacer for symmetry */}
+          {/* CENTER spacer so left/right hug center */}
           <div className="hidden md:block w-6" />
 
           {/* RIGHT (desktop) */}
@@ -129,10 +144,10 @@ export default function Nav() {
             <NavLink href="/short-films">SHORT FILMS</NavLink>
           </nav>
 
-          {/* MOBILE: left placeholder keeps hamburger on right */}
+          {/* MOBILE: placeholder so hamburger pins right */}
           <div className="md:hidden" />
 
-          {/* MOBILE HAMBURGER */}
+          {/* MOBILE: hamburger */}
           <div className="md:hidden flex justify-end pr-1">
             <button
               aria-label="Open menu"
@@ -147,20 +162,20 @@ export default function Nav() {
         </div>
       </div>
 
-      {/* MOBILE OVERLAY */}
+      {/* MOBILE OVERLAY (slide-in) */}
       <div
         className={`md:hidden fixed inset-0 z-[60] transition ${
           open ? "pointer-events-auto" : "pointer-events-none"
         }`}
       >
-        {/* Backdrop */}
+        {/* backdrop */}
         <div
           onClick={() => setOpen(false)}
           className={`absolute inset-0 bg-black/70 backdrop-blur transition-opacity ${
             open ? "opacity-100" : "opacity-0"
           }`}
         />
-        {/* Panel */}
+        {/* panel */}
         <div
           className={`absolute right-0 top-0 h-full w-[88%] max-w-sm bg-[#121212] text-white border-l border-white/10 shadow-2xl transition-transform duration-300 ${
             open ? "translate-x-0" : "translate-x-full"
@@ -173,7 +188,6 @@ export default function Nav() {
               onClick={() => setOpen(false)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 hover:bg-white/20"
             >
-              <span className="sr-only">Close</span>
               <div className="relative h-5 w-5">
                 <span className="absolute left-1/2 top-1/2 block h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-white" />
                 <span className="absolute left-1/2 top-1/2 block h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-white" />
@@ -200,7 +214,7 @@ export default function Nav() {
   );
 }
 
-/* ----------------- Desktop helpers ----------------- */
+/* ---------- desktop helpers ---------- */
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -247,7 +261,7 @@ function DesktopDropdown({
   );
 }
 
-/* ----------------- Mobile helpers ----------------- */
+/* ---------- mobile helpers ---------- */
 
 function MobileSection({
   label,
@@ -312,3 +326,4 @@ function MobileLink({
     </Link>
   );
 }
+
