@@ -1,20 +1,25 @@
-// app/layout.tsx
-import type { Metadata } from "next";
 import "./globals.css";
-import Nav from "@/app/components/nav";
+import { Inter, Playfair_Display } from "next/font/google";
 
-export const metadata: Metadata = {
-  title: "LandCommand.ai",
-  description:
-    "Middle Tennessee's Premier Property Specialists—Land, Farm, Equestrian, Estate.",
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+});
+
+export const metadata = {
+  title: "Land Command",
+  description: "America's Premiere Land Specialists",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-[#1B1B1B] text-[#EFECE0] antialiased">
-        {/* Header lives here exactly once */}
-        <Nav />
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <body className="font-sans bg-black text-white">
         {children}
       </body>
     </html>
