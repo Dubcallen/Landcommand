@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+/* ----------------------- Menu data ----------------------- */
+
 type Item = { href: string; label: string };
 
 const ABOUT: Item[] = [
@@ -20,10 +22,12 @@ const PROPERTIES: Item[] = [
   { href: "/sell", label: "List Your Property" },
 ];
 
+/* -------------------- Header component ------------------- */
+
 export default function Nav() {
   const [open, setOpen] = useState(false);
 
-  // lock scroll when mobile drawer open
+  // lock background scroll when mobile drawer is open
   useEffect(() => {
     const root = document.documentElement;
     const body = document.body;
@@ -42,39 +46,39 @@ export default function Nav() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      {/* Glass bar */}
+      {/* Glassy nav bar (subtle like Covey Rise) */}
       <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-8">
-        <div className="mt-3 rounded-2xl border border-white/10 bg-[rgba(18,18,18,0.55)] backdrop-blur supports-[backdrop-filter]:bg-[rgba(18,18,18,0.35)] shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+        <div className="mt-3 rounded-2xl border border-white/10 bg-[rgba(18,18,18,0.48)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgba(18,18,18,0.32)] shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center px-4 py-3">
             {/* LEFT (desktop) */}
-            <div className="hidden md:flex items-center justify-end gap-10">
+            <div className="hidden md:flex items-center justify-end gap-8">
               <DesktopDropdown label="ABOUT LAND COMMAND" items={ABOUT} />
               <DesktopDropdown label="PROPERTIES" items={PROPERTIES} />
             </div>
 
-            {/* CENTER logo */}
+            {/* CENTER logo (click to home) */}
             <Link
               href="/"
               aria-label="Land Command — Home"
-              className="mx-4 flex items-center justify-center"
+              className="mx-2 flex items-center justify-center"
             >
               <Image
                 src="/sight_only.png"
                 alt="Land Command"
-                width={44}
-                height={44}
-                className="drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+                width={46}
+                height={46}
                 priority
+                className="drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
               />
             </Link>
 
             {/* RIGHT (desktop) */}
-            <nav className="hidden md:flex items-center justify-start gap-10">
+            <nav className="hidden md:flex items-center justify-start gap-8">
               <NavLink href="/search">SEARCH FOR LAND</NavLink>
               <NavLink href="/short-films">SHORT FILMS</NavLink>
             </nav>
 
-            {/* MOBILE hamburger (right edge) */}
+            {/* MOBILE hamburger */}
             <div className="md:hidden col-span-3 flex justify-end">
               <button
                 aria-label="Open menu"
@@ -165,7 +169,7 @@ export default function Nav() {
   );
 }
 
-/* ---------- desktop helpers ---------- */
+/* ----------------------- Desktop UI ---------------------- */
 
 function NavLink({
   href,
@@ -177,42 +181,69 @@ function NavLink({
   return (
     <Link
       href={href}
-      className="text-white/90 hover:text-white text-[13px] uppercase tracking-[0.18em]"
+      className="text-white/90 hover:text-white text-[13px] uppercase tracking-[0.18em] leading-none"
     >
       {children}
     </Link>
   );
 }
 
+/**
+ * Desktop dropdown that does not flicker:
+ * - Uses mouseenter/leave with a small close delay
+ * - The wrapper covers both the trigger and the panel (no gap)
+ */
 function DesktopDropdown({ label, items }: { label: string; items: Item[] }) {
+  const [open, setOpen] = useState(false);
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const handleEnter = () => {
+    if (timer) clearTimeout(timer);
+    setOpen(true);
+  };
+  const handleLeave = () => {
+    const t = setTimeout(() => setOpen(false), 120); // tiny grace period
+    setTimer(t);
+  };
+
   return (
-    <div className="group relative">
-      <span className="cursor-default text-white/90 hover:text-white text-[13px] uppercase tracking-[0.18em]">
+    <div
+      className="relative"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      <span className="cursor-default text-white/90 hover:text-white text-[13px] uppercase tracking-[0.18em] leading-none">
         {label}
       </span>
+
+      {/* Panel wrapper is anchored to top-full; no gap between trigger and panel */}
       <div
-        className="
-          invisible absolute left-1/2 mt-3 w-64 -translate-x-1/2 rounded-xl
-          border border-white/10 bg-[rgba(18,18,18,0.9)] p-2 text-sm text-white/90
-          opacity-0 shadow-xl backdrop-blur transition
-          group-hover:visible group-hover:opacity-100
-        "
+        className={`absolute left-1/2 top-full -translate-x-1/2 pt-3 ${
+          open ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+        style={{ minWidth: "16rem" }}
       >
-        {items.map((it) => (
-          <Link
-            key={it.href}
-            href={it.href}
-            className="block rounded-lg px-4 py-2 hover:bg-white/10 hover:text-white"
-          >
-            {it.label}
-          </Link>
-        ))}
+        <div
+          className={`rounded-xl border border-white/10 bg-[rgba(18,18,18,0.92)] backdrop-blur px-2 py-2 text-sm text-white/90 shadow-xl transition-all duration-150 ${
+            open ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"
+          }`}
+        >
+          {items.map((it) => (
+            <Link
+              key={it.href}
+              href={it.href}
+              className="block rounded-lg px-4 py-2 hover:bg-white/10 hover:text-white"
+            >
+              {it.label}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-/* ---------- mobile helpers ---------- */
+/* ----------------------- Mobile UI ----------------------- */
 
 function MobileGroup({
   title,
@@ -231,10 +262,7 @@ function MobileGroup({
         className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-[13px] uppercase tracking-[0.18em] hover:bg-white/5"
       >
         <span>{title}</span>
-        <span
-          className={`transition-transform ${open ? "rotate-180" : ""}`}
-          aria-hidden
-        >
+        <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden>
           ▾
         </span>
       </button>
