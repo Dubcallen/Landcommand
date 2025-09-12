@@ -1,16 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-
-/**
- * Covey-style glass header:
- * - Desktop: LEFT (About, Properties, Services) | spacer | RIGHT (Search, Short Films, Contact)
- * - Hover dropdowns
- * - Mobile: hamburger opens full-screen slide-in + quick CTAs
- * - Subtle scroll inertia (drag) polish
- * - No logo here (your hero owns branding)
- */
+import { useEffect, useState } from "react";
 
 type Item = { href: string; label: string };
 
@@ -18,82 +9,23 @@ const ABOUT: Item[] = [
   { href: "/about/firm", label: "Our Firm" },
   { href: "/about/process", label: "Our Process" },
   { href: "/about/press", label: "Press" },
-  { href: "/about/stories", label: "Stories" }, // $20K package showcase + CTA
+  { href: "/about/stories", label: "Stories" },
 ];
 
 const PROPERTIES: Item[] = [
-  { href: "/properties/available", label: "Available" }, // primary buyer funnel
+  { href: "/properties/available", label: "Available" },
   { href: "/properties/under-contract", label: "Under Contract" },
   { href: "/properties/sold", label: "Sold" },
-  { href: "/sell", label: "List Your Property" }, // $800 listing checkout
+  { href: "/sell", label: "List Your Property" },
 ];
-
-const SERVICES: Item[] = [
-  { href: "/sell", label: "Flat Listing Fees ($800)" },
-  { href: "/short-films", label: "Reels ($5K)" },
-  { href: "/about/stories", label: "Stories ($20K)" },
-  { href: "/brokerage", label: "Brokerage (10%)" },
-  { href: "/financing", label: "Seller Financing" },
-];
-
-// light physics for the “drag” effect
-const clamp = (n: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, n));
 
 export default function Nav() {
-  // inertia scroll
-  const [progress, setProgress] = useState(0);
-  const [dragY, setDragY] = useState(0);
-  const target = useRef(0);
-  const cur = useRef(0);
-  const vel = useRef(0);
-  const raf = useRef<number | null>(null);
-
-  const STIFF = 0.02,
-    DAMP = 0.1,
-    MAX = 180,
-    DRAG = 0.45;
-
-  useEffect(() => {
-    const onScroll = () => {
-      target.current = window.scrollY;
-      if (raf.current == null) animate();
-    };
-    const animate = () => {
-      raf.current = requestAnimationFrame(animate);
-      const x = cur.current,
-        v = vel.current,
-        t = target.current;
-      const force = STIFF * (t - x) - DAMP * v;
-      const nv = v + force;
-      const nx = x + nv;
-      cur.current = nx;
-      vel.current = nv;
-      setProgress(clamp(nx / MAX, 0, 1));
-      setDragY((nx - t) * DRAG);
-      if (Math.abs(nx - t) < 0.1 && Math.abs(nv) < 0.1) {
-        if (raf.current) cancelAnimationFrame(raf.current);
-        raf.current = null;
-      }
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (raf.current) cancelAnimationFrame(raf.current);
-    };
-  }, []);
-
-  const blur = 12 * progress;
-  const tint = 0.4 * progress;
-  const border = 0.1 * progress;
-  const shadow = 0.28 * progress;
-
-  // mobile state
   const [open, setOpen] = useState(false);
+
+  // prevent background scroll when mobile menu open
   useEffect(() => {
-    const root = document.documentElement,
-      body = document.body;
+    const root = document.documentElement;
+    const body = document.body;
     if (open) {
       root.classList.add("overflow-hidden");
       body.classList.add("overflow-hidden");
@@ -110,32 +42,23 @@ export default function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
       <div
-        className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 transition-[transform,background-color,backdrop-filter] duration-300"
-        style={{
-          transform: `translateY(${dragY}px)`,
-          backdropFilter: `blur(${blur}px)`,
-          WebkitBackdropFilter: `blur(${blur}px)`,
-          backgroundColor: `rgba(0,0,0,${tint})`,
-          borderBottom: `1px solid rgba(255,255,255,${border})`,
-          boxShadow: `0 8px 24px rgba(0,0,0,${shadow})`,
-        }}
+        className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 transition-[background-color,backdrop-filter] duration-300
+        backdrop-blur bg-black/40 border-b border-white/10"
       >
         <div className="grid grid-cols-[1fr_auto_1fr] items-center py-4">
           {/* LEFT (desktop) */}
           <div className="hidden md:flex items-center justify-end gap-10">
-            <DesktopDropdown label="ABOUT" items={ABOUT} />
+            <DesktopDropdown label="ABOUT LAND COMMAND" items={ABOUT} />
             <DesktopDropdown label="PROPERTIES" items={PROPERTIES} />
-            <DesktopDropdown label="SERVICES" items={SERVICES} />
           </div>
 
-          {/* spacer to keep both sides near center */}
+          {/* CENTER spacer */}
           <div className="hidden md:block w-6" />
 
           {/* RIGHT (desktop) */}
           <nav className="hidden md:flex items-center justify-start gap-10">
             <NavLink href="/search">SEARCH FOR LAND</NavLink>
             <NavLink href="/short-films">SHORT FILMS</NavLink>
-            <NavLink href="/contact">CONTACT</NavLink>
           </nav>
 
           {/* MOBILE hamburger */}
@@ -188,18 +111,13 @@ export default function Nav() {
 
           <div className="p-4">
             <MobileGroup
-              title="ABOUT"
+              title="ABOUT LAND COMMAND"
               items={ABOUT}
               onClose={() => setOpen(false)}
             />
             <MobileGroup
               title="PROPERTIES"
               items={PROPERTIES}
-              onClose={() => setOpen(false)}
-            />
-            <MobileGroup
-              title="SERVICES"
-              items={SERVICES}
               onClose={() => setOpen(false)}
             />
             <div className="mt-2 space-y-1">
@@ -209,12 +127,7 @@ export default function Nav() {
               <MobileLink href="/short-films" onClick={() => setOpen(false)}>
                 SHORT FILMS
               </MobileLink>
-              <MobileLink href="/contact" onClick={() => setOpen(false)}>
-                CONTACT
-              </MobileLink>
             </div>
-
-            {/* Quick revenue CTAs */}
             <div className="mt-6 grid gap-3">
               <a
                 href="/sell"
@@ -351,5 +264,6 @@ function MobileLink({
     </Link>
   );
 }
+
 
 
