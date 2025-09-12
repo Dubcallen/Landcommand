@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type Item = { href: string; label: string };
@@ -22,7 +23,7 @@ const PROPERTIES: Item[] = [
 export default function Nav() {
   const [open, setOpen] = useState(false);
 
-  // prevent background scroll when mobile menu open
+  // lock scroll when mobile drawer open
   useEffect(() => {
     const root = document.documentElement;
     const body = document.body;
@@ -41,42 +42,55 @@ export default function Nav() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      <div
-        className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8 transition-[background-color,backdrop-filter] duration-300
-        backdrop-blur bg-black/40 border-b border-white/10"
-      >
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center py-4">
-          {/* LEFT (desktop) */}
-          <div className="hidden md:flex items-center justify-end gap-10">
-            <DesktopDropdown label="ABOUT LAND COMMAND" items={ABOUT} />
-            <DesktopDropdown label="PROPERTIES" items={PROPERTIES} />
-          </div>
+      {/* Glass bar */}
+      <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-8">
+        <div className="mt-3 rounded-2xl border border-white/10 bg-[rgba(18,18,18,0.55)] backdrop-blur supports-[backdrop-filter]:bg-[rgba(18,18,18,0.35)] shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center px-4 py-3">
+            {/* LEFT (desktop) */}
+            <div className="hidden md:flex items-center justify-end gap-10">
+              <DesktopDropdown label="ABOUT LAND COMMAND" items={ABOUT} />
+              <DesktopDropdown label="PROPERTIES" items={PROPERTIES} />
+            </div>
 
-          {/* CENTER spacer */}
-          <div className="hidden md:block w-6" />
-
-          {/* RIGHT (desktop) */}
-          <nav className="hidden md:flex items-center justify-start gap-10">
-            <NavLink href="/search">SEARCH FOR LAND</NavLink>
-            <NavLink href="/short-films">SHORT FILMS</NavLink>
-          </nav>
-
-          {/* MOBILE hamburger */}
-          <div className="md:hidden col-span-3 flex justify-end pr-1">
-            <button
-              aria-label="Open menu"
-              onClick={() => setOpen(true)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-black/35 text-white hover:bg-black/50"
+            {/* CENTER logo */}
+            <Link
+              href="/"
+              aria-label="Land Command — Home"
+              className="mx-4 flex items-center justify-center"
             >
-              <span className="block h-0.5 w-5 bg-white mb-1.5" />
-              <span className="block h-0.5 w-5 bg-white mb-1.5" />
-              <span className="block h-0.5 w-5 bg-white" />
-            </button>
+              <Image
+                src="/sight_only.png"
+                alt="Land Command"
+                width={44}
+                height={44}
+                className="drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+                priority
+              />
+            </Link>
+
+            {/* RIGHT (desktop) */}
+            <nav className="hidden md:flex items-center justify-start gap-10">
+              <NavLink href="/search">SEARCH FOR LAND</NavLink>
+              <NavLink href="/short-films">SHORT FILMS</NavLink>
+            </nav>
+
+            {/* MOBILE hamburger (right edge) */}
+            <div className="md:hidden col-span-3 flex justify-end">
+              <button
+                aria-label="Open menu"
+                onClick={() => setOpen(true)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-black/40 text-white hover:bg-black/55"
+              >
+                <span className="block h-0.5 w-5 bg-white mb-1.5" />
+                <span className="block h-0.5 w-5 bg-white mb-1.5" />
+                <span className="block h-0.5 w-5 bg-white" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* MOBILE OVERLAY */}
+      {/* MOBILE full-screen drawer */}
       <div
         className={`md:hidden fixed inset-0 z-[60] ${
           open ? "pointer-events-auto" : "pointer-events-none"
@@ -128,6 +142,8 @@ export default function Nav() {
                 SHORT FILMS
               </MobileLink>
             </div>
+
+            {/* Quick CTAs */}
             <div className="mt-6 grid gap-3">
               <a
                 href="/sell"
@@ -161,7 +177,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className="text-white/90 hover:text-white text-[13px] uppercase tracking-[0.16em]"
+      className="text-white/90 hover:text-white text-[13px] uppercase tracking-[0.18em]"
     >
       {children}
     </Link>
@@ -171,15 +187,15 @@ function NavLink({
 function DesktopDropdown({ label, items }: { label: string; items: Item[] }) {
   return (
     <div className="group relative">
-      <span className="cursor-default text-white/90 hover:text-white text-[13px] uppercase tracking-[0.16em]">
+      <span className="cursor-default text-white/90 hover:text-white text-[13px] uppercase tracking-[0.18em]">
         {label}
       </span>
       <div
         className="
           invisible absolute left-1/2 mt-3 w-64 -translate-x-1/2 rounded-xl
-          border border-white/10 bg-black/70 p-2 text-sm text-white/90
+          border border-white/10 bg-[rgba(18,18,18,0.9)] p-2 text-sm text-white/90
           opacity-0 shadow-xl backdrop-blur transition
-          group-hover:visible group-hover:opacity-100 group-hover:translate-y-0
+          group-hover:visible group-hover:opacity-100
         "
       >
         {items.map((it) => (
@@ -212,7 +228,7 @@ function MobileGroup({
     <div className="mb-1">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-[13px] uppercase tracking-[0.16em] hover:bg-white/5"
+        className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-[13px] uppercase tracking-[0.18em] hover:bg-white/5"
       >
         <span>{title}</span>
         <span
@@ -258,12 +274,9 @@ function MobileLink({
     <Link
       href={href}
       onClick={onClick}
-      className="block rounded-lg px-3 py-3 text-[13px] uppercase tracking-[0.16em] hover:bg-white/5"
+      className="block rounded-lg px-3 py-3 text-[13px] uppercase tracking-[0.18em] hover:bg-white/5"
     >
       {children}
     </Link>
   );
 }
-
-
-
