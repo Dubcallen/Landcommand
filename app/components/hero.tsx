@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 
 export default function Hero() {
@@ -16,17 +17,18 @@ export default function Hero() {
       />
       <div className="absolute inset-0 bg-black/40" />
 
-      {/* Logo + Business Name + Tagline */}
-      <div className="relative z-10 flex flex-col items-center pt-24 text-center">
-        <Image
-          src="/sight_only.png"
-          alt="Land Command"
-          width={140}
-          height={140}
-          className="mb-4"
-        />
-        {/* Playfair Display 400 with tighter tracking for a thinner, elegant feel */}
-        <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em] text-[#EFECE0]">
+      {/* Logo + Name + Tagline */}
+      <div className="relative z-10 flex flex-col items-center pt-28 text-center">
+        <Link href="/" aria-label="Go to homepage" className="mb-4">
+          <Image
+            src="/sight_only.png"
+            alt="Land Command"
+            width={140}
+            height={140}
+            priority
+          />
+        </Link>
+        <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
           LAND COMMAND
         </h1>
         <p className="mt-3 text-lg md:text-xl font-sans text-white/90 uppercase tracking-wide">
@@ -34,22 +36,24 @@ export default function Hero() {
         </p>
       </div>
 
-      {/* Category line + subcopy + buttons */}
+      {/* Category pill */}
       <div className="relative z-10 mx-auto mt-10 max-w-3xl px-6 text-center">
-        <h2 className="font-serif text-3xl md:text-4xl tracking-wide text-[#EFECE0]">
-          LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; EQUESTRIAN &nbsp; | &nbsp; ESTATE
+        <h2 className="font-serif text-3xl md:text-4xl tracking-wide text-ivory">
+          LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; EQUESTRIAN &nbsp; | &nbsp;
+          ESTATE
         </h2>
         <p className="mt-6 font-sans text-base md:text-lg text-gray-200">
-          Middle Tennessee&apos;s Premier Property Specialists, Bringing Exceptional Land
-          Opportunities to Discerning Investors and Legacy Builders
+          Middle Tennessee&apos;s Premier Land Specialists, Bringing Exceptional
+          Land Opportunities to Discerning Investors and Legacy Builders
         </p>
 
+        {/* Buttons */}
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
-            href="/properties"
+            href="/properties/available"
             className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
           >
-            Exclusive Land
+            Exclusive Properties
           </a>
           <a
             href="/contact"
@@ -60,7 +64,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-charcoal" />
     </section>
   );
 }
