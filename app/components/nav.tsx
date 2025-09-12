@@ -36,6 +36,7 @@ const SERVICES: Item[] = [
   { href: "/financing", label: "Seller Financing" },
 ];
 
+// light physics for the “drag” effect
 const clamp = (n: number, min: number, max: number) =>
   Math.min(max, Math.max(min, n));
 
@@ -48,7 +49,10 @@ export default function Nav() {
   const vel = useRef(0);
   const raf = useRef<number | null>(null);
 
-  const STIFF = 0.02, DAMP = 0.10, MAX = 180, DRAG = 0.45;
+  const STIFF = 0.02,
+    DAMP = 0.1,
+    MAX = 180,
+    DRAG = 0.45;
 
   useEffect(() => {
     const onScroll = () => {
@@ -57,11 +61,14 @@ export default function Nav() {
     };
     const animate = () => {
       raf.current = requestAnimationFrame(animate);
-      const x = cur.current, v = vel.current, t = target.current;
+      const x = cur.current,
+        v = vel.current,
+        t = target.current;
       const force = STIFF * (t - x) - DAMP * v;
       const nv = v + force;
       const nx = x + nv;
-      cur.current = nx; vel.current = nv;
+      cur.current = nx;
+      vel.current = nv;
       setProgress(clamp(nx / MAX, 0, 1));
       setDragY((nx - t) * DRAG);
       if (Math.abs(nx - t) < 0.1 && Math.abs(nv) < 0.1) {
@@ -78,17 +85,26 @@ export default function Nav() {
   }, []);
 
   const blur = 12 * progress;
-  const tint = 0.40 * progress;
-  const border = 0.10 * progress;
+  const tint = 0.4 * progress;
+  const border = 0.1 * progress;
   const shadow = 0.28 * progress;
 
-  // mobile
+  // mobile state
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    const root = document.documentElement, body = document.body;
-    if (open) { root.classList.add("overflow-hidden"); body.classList.add("overflow-hidden"); }
-    else { root.classList.remove("overflow-hidden"); body.classList.remove("overflow-hidden"); }
-    return () => { root.classList.remove("overflow-hidden"); body.classList.remove("overflow-hidden"); };
+    const root = document.documentElement,
+      body = document.body;
+    if (open) {
+      root.classList.add("overflow-hidden");
+      body.classList.add("overflow-hidden");
+    } else {
+      root.classList.remove("overflow-hidden");
+      body.classList.remove("overflow-hidden");
+    }
+    return () => {
+      root.classList.remove("overflow-hidden");
+      body.classList.remove("overflow-hidden");
+    };
   }, [open]);
 
   return (
@@ -112,7 +128,7 @@ export default function Nav() {
             <DesktopDropdown label="SERVICES" items={SERVICES} />
           </div>
 
-          {/* spacer keeps both sides tight toward center */}
+          {/* spacer to keep both sides near center */}
           <div className="hidden md:block w-6" />
 
           {/* RIGHT (desktop) */}
@@ -122,7 +138,7 @@ export default function Nav() {
             <NavLink href="/contact">CONTACT</NavLink>
           </nav>
 
-          {/* MOBILE: hamburger on right */}
+          {/* MOBILE hamburger */}
           <div className="md:hidden col-span-3 flex justify-end pr-1">
             <button
               aria-label="Open menu"
@@ -138,16 +154,26 @@ export default function Nav() {
       </div>
 
       {/* MOBILE OVERLAY */}
-      <div className={`md:hidden fixed inset-0 z-[60] ${open ? "pointer-events-auto" : "pointer-events-none"}`}>
+      <div
+        className={`md:hidden fixed inset-0 z-[60] ${
+          open ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+      >
         <div
-          className={`absolute inset-0 bg-black/70 backdrop-blur transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-black/70 backdrop-blur transition-opacity ${
+            open ? "opacity-100" : "opacity-0"
+          }`}
           onClick={() => setOpen(false)}
         />
         <aside
-          className={`absolute right-0 top-0 h-full w-[88%] max-w-sm bg-[#121212] text-white border-l border-white/10 shadow-2xl transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}
+          className={`absolute right-0 top-0 h-full w-[88%] max-w-sm bg-[#121212] text-white border-l border-white/10 shadow-2xl transition-transform duration-300 ${
+            open ? "translate-x-0" : "translate-x-full"
+          }`}
         >
           <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
-            <div className="text-sm uppercase tracking-[0.18em] text-white/80">Menu</div>
+            <div className="text-sm uppercase tracking-[0.18em] text-white/80">
+              Menu
+            </div>
             <button
               aria-label="Close menu"
               onClick={() => setOpen(false)}
@@ -161,21 +187,45 @@ export default function Nav() {
           </div>
 
           <div className="p-4">
-            <MobileGroup title="ABOUT" items={ABOUT} onClose={() => setOpen(false)} />
-            <MobileGroup title="PROPERTIES" items={PROPERTIES} onClose={() => setOpen(false)} />
-            <MobileGroup title="SERVICES" items={SERVICES} onClose={() => setOpen(false)} />
+            <MobileGroup
+              title="ABOUT"
+              items={ABOUT}
+              onClose={() => setOpen(false)}
+            />
+            <MobileGroup
+              title="PROPERTIES"
+              items={PROPERTIES}
+              onClose={() => setOpen(false)}
+            />
+            <MobileGroup
+              title="SERVICES"
+              items={SERVICES}
+              onClose={() => setOpen(false)}
+            />
             <div className="mt-2 space-y-1">
-              <MobileLink href="/search" onClick={() => setOpen(false)}>SEARCH FOR LAND</MobileLink>
-              <MobileLink href="/short-films" onClick={() => setOpen(false)}>SHORT FILMS</MobileLink>
-              <MobileLink href="/contact" onClick={() => setOpen(false)}>CONTACT</MobileLink>
+              <MobileLink href="/search" onClick={() => setOpen(false)}>
+                SEARCH FOR LAND
+              </MobileLink>
+              <MobileLink href="/short-films" onClick={() => setOpen(false)}>
+                SHORT FILMS
+              </MobileLink>
+              <MobileLink href="/contact" onClick={() => setOpen(false)}>
+                CONTACT
+              </MobileLink>
             </div>
 
-            {/* Quick CTAs */}
+            {/* Quick revenue CTAs */}
             <div className="mt-6 grid gap-3">
-              <a href="/sell" className="rounded-xl border border-[rgba(203,178,106,0.5)] bg-[rgba(203,178,106,0.9)] px-4 py-3 text-center font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]">
+              <a
+                href="/sell"
+                className="rounded-xl border border-[rgba(203,178,106,0.5)] bg-[rgba(203,178,106,0.9)] px-4 py-3 text-center font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
+              >
                 List Your Property
               </a>
-              <a href="/contact" className="rounded-xl border border-white/25 px-4 py-3 text-center text-white hover:bg-white/10">
+              <a
+                href="/contact"
+                className="rounded-xl border border-white/25 px-4 py-3 text-center text-white hover:bg-white/10"
+              >
                 Speak with a Specialist
               </a>
             </div>
@@ -188,9 +238,18 @@ export default function Nav() {
 
 /* ---------- desktop helpers ---------- */
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
   return (
-    <Link href={href} className="text-white/90 hover:text-white text-[13px] uppercase tracking-[0.16em]">
+    <Link
+      href={href}
+      className="text-white/90 hover:text-white text-[13px] uppercase tracking-[0.16em]"
+    >
       {children}
     </Link>
   );
@@ -199,7 +258,9 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 function DesktopDropdown({ label, items }: { label: string; items: Item[] }) {
   return (
     <div className="group relative">
-      <span className="cursor-default text-white/90 hover:text-white text-[13px] uppercase tracking-[0.16em]">{label}</span>
+      <span className="cursor-default text-white/90 hover:text-white text-[13px] uppercase tracking-[0.16em]">
+        {label}
+      </span>
       <div
         className="
           invisible absolute left-1/2 mt-3 w-64 -translate-x-1/2 rounded-xl
@@ -209,7 +270,11 @@ function DesktopDropdown({ label, items }: { label: string; items: Item[] }) {
         "
       >
         {items.map((it) => (
-          <Link key={it.href} href={it.href} className="block rounded-lg px-4 py-2 hover:bg-white/10 hover:text-white">
+          <Link
+            key={it.href}
+            href={it.href}
+            className="block rounded-lg px-4 py-2 hover:bg-white/10 hover:text-white"
+          >
             {it.label}
           </Link>
         ))}
@@ -237,13 +302,26 @@ function MobileGroup({
         className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-[13px] uppercase tracking-[0.16em] hover:bg-white/5"
       >
         <span>{title}</span>
-        <span className={`transition-transform ${open ? "rotate-180" : ""}`} aria-hidden>▾</span>
+        <span
+          className={`transition-transform ${open ? "rotate-180" : ""}`}
+          aria-hidden
+        >
+          ▾
+        </span>
       </button>
-      <div className={`overflow-hidden transition-[max-height,opacity] duration-300 ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
+      <div
+        className={`overflow-hidden transition-[max-height,opacity] duration-300 ${
+          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
         <ul className="px-3 pb-2 pt-1">
           {items.map((it) => (
             <li key={it.href}>
-              <Link href={it.href} onClick={onClose} className="block rounded-md px-3 py-2 text-white/90 hover:bg-white/10 hover:text-white">
+              <Link
+                href={it.href}
+                onClick={onClose}
+                className="block rounded-md px-3 py-2 text-white/90 hover:bg-white/10 hover:text-white"
+              >
                 {it.label}
               </Link>
             </li>
@@ -264,9 +342,14 @@ function MobileLink({
   onClick?: () => void;
 }) {
   return (
-    <Link href={href} onClick={onClick} className="block rounded-lg px-3 py-3 text-[13px] uppercase tracking-[0.16em] hover:bg-white/5">
+    <Link
+      href={href}
+      onClick={onClick}
+      className="block rounded-lg px-3 py-3 text-[13px] uppercase tracking-[0.16em] hover:bg-white/5"
+    >
       {children}
     </Link>
   );
 }
+
 
