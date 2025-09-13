@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 export default function Nav() {
-  const [openDropdown, setOpenDropdown] = useState<"about" | "properties" | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [open, setOpen] = useState<null | "about" | "properties">(null);
+  const [drawer, setDrawer] = useState(false);
 
   const aboutRef = useRef<HTMLDivElement>(null);
   const propsRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // close dropdowns when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       const t = e.target as Node;
@@ -21,38 +22,46 @@ export default function Nav() {
         propsRef.current &&
         !propsRef.current.contains(t)
       ) {
-        setOpenDropdown(null);
+        setOpen(null);
       }
     }
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
+  function openNow(which: "about" | "properties") {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(which);
+  }
+  function scheduleClose() {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpen(null), 120);
+  }
+
   return (
     <header className="absolute top-0 z-50 w-full bg-transparent select-none">
-      {/* 3-column grid keeps the logo perfectly centered regardless of left/right widths */}
-      <div className="mx-auto grid max-w-7xl grid-cols-3 items-center px-6 py-5">
+      {/* 3 columns keep the logo exactly centered */}
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-5">
         {/* LEFT (desktop) */}
         <nav className="hidden md:flex items-center justify-start gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
           {/* ABOUT */}
           <div
             ref={aboutRef}
             className="relative"
-            onMouseEnter={() => setOpenDropdown("about")}
-            onMouseLeave={() => setOpenDropdown(null)}
+            onMouseEnter={() => openNow("about")}
+            onMouseLeave={scheduleClose}
           >
             <button
-              onClick={() =>
-                setOpenDropdown((v) => (v === "about" ? null : "about"))
-              }
+              onClick={() => setOpen((v) => (v === "about" ? null : "about"))}
               className="hover:text-[#CBB26A] transition-colors"
               aria-haspopup="true"
-              aria-expanded={openDropdown === "about"}
+              aria-expanded={open === "about"}
             >
               ABOUT LAND COMMAND ▾
             </button>
-            {openDropdown === "about" && (
-              <div className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl">
+
+            {open === "about" && (
+              <div className="absolute left-0 top-full mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl z-50">
                 <MenuLink href="/about/firm">Our Firm</MenuLink>
                 <MenuLink href="/about/process">Our Process</MenuLink>
                 <MenuLink href="/about/press">Press</MenuLink>
@@ -65,21 +74,20 @@ export default function Nav() {
           <div
             ref={propsRef}
             className="relative"
-            onMouseEnter={() => setOpenDropdown("properties")}
-            onMouseLeave={() => setOpenDropdown(null)}
+            onMouseEnter={() => openNow("properties")}
+            onMouseLeave={scheduleClose}
           >
             <button
-              onClick={() =>
-                setOpenDropdown((v) => (v === "properties" ? null : "properties"))
-              }
+              onClick={() => setOpen((v) => (v === "properties" ? null : "properties"))}
               className="hover:text-[#CBB26A] transition-colors"
               aria-haspopup="true"
-              aria-expanded={openDropdown === "properties"}
+              aria-expanded={open === "properties"}
             >
               PROPERTIES ▾
             </button>
-            {openDropdown === "properties" && (
-              <div className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl">
+
+            {open === "properties" && (
+              <div className="absolute left-0 top-full mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl z-50">
                 <MenuLink href="/properties/available">Available</MenuLink>
                 <MenuLink href="/properties/under-contract">Under Contract</MenuLink>
                 <MenuLink href="/properties/sold">Sold</MenuLink>
@@ -89,7 +97,7 @@ export default function Nav() {
           </div>
         </nav>
 
-        {/* CENTER LOGO (always rendered) */}
+        {/* CENTER LOGO — perfectly centered */}
         <div className="flex items-center justify-center">
           <Link href="/" aria-label="Land Command — Home" className="block">
             <Image
@@ -103,8 +111,8 @@ export default function Nav() {
           </Link>
         </div>
 
-        {/* RIGHT (desktop) + HAMBURGER (mobile) */}
-        <div className="flex items-center justify-end gap-6">
+        {/* RIGHT (desktop) + HAMBURGER (always visible) */}
+        <div className="flex items-center justify-end gap-8">
           <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
             <Link className="hover:text-[#CBB26A] transition-colors" href="/search">
               Search for Land
@@ -114,11 +122,11 @@ export default function Nav() {
             </Link>
           </nav>
 
-          {/* Hamburger (visible < md) */}
+          {/* Hamburger is visible on all sizes */}
           <button
-            className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-white/90 hover:text-white focus:outline-none"
+            className="inline-flex items-center justify-center rounded-md p-2 text-white/90 hover:text-white focus:outline-none"
             aria-label="Open menu"
-            onClick={() => setMobileOpen((v) => !v)}
+            onClick={() => setDrawer((v) => !v)}
           >
             <svg
               width="28"
@@ -138,13 +146,13 @@ export default function Nav() {
         </div>
       </div>
 
-      {/* MOBILE DRAWER */}
+      {/* DRAWER */}
       <div
-        className={`md:hidden overflow-hidden transition-[max-height] duration-300 ease-out
-          bg-[#1B1B1B]/95 backdrop-blur border-t border-white/10
-          ${mobileOpen ? "max-h-[420px]" : "max-h-0"}`}
+        className={`fixed inset-x-0 top-[72px] md:top-[84px] z-40 overflow-hidden border-t border-white/10 bg-[#1B1B1B]/95 backdrop-blur transition-[max-height] duration-300 ease-out ${
+          drawer ? "max-h-[520px]" : "max-h-0"
+        }`}
       >
-        <div className="px-6 py-4 font-serif uppercase text-white text-sm">
+        <div className="mx-auto max-w-7xl px-6 py-5 font-serif uppercase text-white text-sm">
           <p className="mb-2 text-white/60">ABOUT LAND COMMAND</p>
           <MobileLink href="/about/firm">Our Firm</MobileLink>
           <MobileLink href="/about/process">Our Process</MobileLink>
@@ -170,6 +178,8 @@ export default function Nav() {
     </header>
   );
 }
+
+/* ---- subcomponents ---- */
 
 function MenuLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
