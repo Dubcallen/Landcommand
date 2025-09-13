@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export const metadata = {
   title: "Land Command — America’s Premiere Land Specialists",
   description:
@@ -11,7 +9,6 @@ export default function HomePage() {
     <main className="bg-[#1B1B1B] text-[#EFECE0]">
       {/* HERO */}
       <section className="relative isolate min-h-screen w-full overflow-hidden">
-        {/* Background video */}
         <video
           src="/hero.mp4"
           autoPlay
@@ -22,19 +19,16 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-black/40" />
 
-        {/* Branding */}
+        {/* Center stack with the same vertical rhythm as before.
+            We removed the big logo and keep spacing using a spacer box. */}
         <div className="relative z-10 flex flex-col items-center pt-28 text-center">
-          <Image
-            src="/sight_only.png"
-            alt="Land Command"
-            width={140}
-            height={140}
-            priority
-            className="mb-4"
-          />
+          {/* spacer replacing the removed large logo (keeps exact rhythm) */}
+          <div className="h-[120px] md:h-[140px]" aria-hidden />
+
           <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
             LAND COMMAND
           </h1>
+
           <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
             America&apos;s Premiere Land Specialists
           </p>
@@ -69,6 +63,7 @@ export default function HomePage() {
         <div className="mb-6 flex items-end justify-between">
           <h2 className="font-serif text-3xl md:text-4xl">Explore Land Command</h2>
         </div>
+
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[
             {
@@ -96,6 +91,7 @@ export default function HomePage() {
               className="group overflow-hidden rounded-2xl border border-white/10 bg-black/40 hover:bg-black/55 transition-colors"
             >
               <div className="relative aspect-[4/3] overflow-hidden">
+                {/* Only the image scales on hover */}
                 <img
                   src={card.src}
                   alt={card.title}
