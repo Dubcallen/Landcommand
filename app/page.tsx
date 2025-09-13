@@ -7,9 +7,8 @@ export const metadata = {
 export default function HomePage() {
   return (
     <main className="bg-[#1B1B1B] text-[#EFECE0]">
-      {/* HERO (video + name + tagline + CTA row + category pill) */}
+      {/* HERO */}
       <section className="relative isolate min-h-screen w-full overflow-hidden">
-        {/* Background video */}
         <video
           src="/hero.mp4"
           autoPlay
@@ -20,43 +19,79 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-black/40" />
 
-        {/* Center branding */}
         <div className="relative z-10 flex flex-col items-center pt-28 text-center">
-          {/* Spacer equal to removed logo height so spacing stays identical */}
-          <div className="h-[140px] mb-4" />
-
+          {/* (No large hero logo) */}
           <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
             LAND COMMAND
           </h1>
 
-          {/* Cormorant Garamond if your layout maps font-serif to it */}
           <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
             America&apos;s Premiere Land Specialists
           </p>
 
-          {/* Category line */}
           <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
             LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
           </div>
 
-          {/* CTAs */}
+          {/* CTAs (renamed + correct destinations) */}
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <a
               href="/properties/available"
               className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
             >
-              Exclusive Properties
+              Buy
             </a>
             <a
-              href="/contact"
+              href="/sell"
               className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-sans text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
             >
-              Speak with a Specialist
+              Sell
             </a>
           </div>
         </div>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
+      </section>
+
+      {/* === Featured Properties (restored bottom of page) === */}
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mb-6 flex items-end justify-between">
+          <h2 className="font-serif text-3xl md:text-4xl">Featured Properties</h2>
+          <a href="/properties/available" className="text-sm text-white/80 hover:text-white">
+            View All →
+          </a>
+        </div>
+
+        {/* 3-card grid. Images pulled from /public (tile-1.jpg etc). Only the IMAGE scales on hover. */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { src: "/tile-1.jpg", title: "Riverbend Ridge", meta: "Lewis County, TN • 92± Acres" },
+            { src: "/tile-2.jpg", title: "Cedar Hollow Farm", meta: "Maury County, TN • 48± Acres" },
+            { src: "/tile-3.jpg", title: "Timberline Estate", meta: "Williamson County, TN • 26± Acres" },
+          ].map((card, i) => (
+            <a
+              key={i}
+              href="/properties/available"
+              className="group overflow-hidden rounded-2xl border border-white/10 bg-black/40 transition-colors hover:bg-black/55"
+            >
+              <div className="relative aspect-[4/3] overflow-hidden">
+                {/* Only the image scales */}
+                <img
+                  src={card.src}
+                  alt={card.title}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              </div>
+              <div className="p-5">
+                <div className="text-xs uppercase tracking-[0.18em] text-white/60">
+                  Exclusive
+                </div>
+                <h3 className="mt-1 text-xl font-serif font-semibold">{card.title}</h3>
+                <p className="mt-1 text-white/75">{card.meta}</p>
+              </div>
+            </a>
+          ))}
+        </div>
       </section>
     </main>
   );
