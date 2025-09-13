@@ -39,7 +39,10 @@ export default function Nav() {
   }
 
   return (
-    <header className="absolute top-0 z-50 w-full bg-transparent select-none">
+    <header
+      className="absolute top-0 z-50 w-full bg-transparent select-none border-b-0 shadow-none"
+      style={{ borderBottom: "0 none", boxShadow: "none" }}
+    >
       {/* 3 columns keep the logo exactly centered */}
       <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-5">
         {/* LEFT (desktop) */}
@@ -78,7 +81,9 @@ export default function Nav() {
             onMouseLeave={scheduleClose}
           >
             <button
-              onClick={() => setOpen((v) => (v === "properties" ? null : "properties"))}
+              onClick={() =>
+                setOpen((v) => (v === "properties" ? null : "properties"))
+              }
               className="hover:text-[#CBB26A] transition-colors"
               aria-haspopup="true"
               aria-expanded={open === "properties"}
@@ -89,7 +94,9 @@ export default function Nav() {
             {open === "properties" && (
               <div className="absolute left-0 top-full mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl z-50">
                 <MenuLink href="/properties/available">Available</MenuLink>
-                <MenuLink href="/properties/under-contract">Under Contract</MenuLink>
+                <MenuLink href="/properties/under-contract">
+                  Under Contract
+                </MenuLink>
                 <MenuLink href="/properties/sold">Sold</MenuLink>
                 <MenuLink href="/sell">List Your Property</MenuLink>
               </div>
@@ -117,7 +124,10 @@ export default function Nav() {
             <Link className="hover:text-[#CBB26A] transition-colors" href="/search">
               Search for Land
             </Link>
-            <Link className="hover:text-[#CBB26A] transition-colors" href="/short-films">
+            <Link
+              className="hover:text-[#CBB26A] transition-colors"
+              href="/short-films"
+            >
               Short Films
             </Link>
           </nav>
@@ -163,7 +173,9 @@ export default function Nav() {
 
           <p className="mt-4 mb-2 text-white/60">PROPERTIES</p>
           <MobileLink href="/properties/available">Available</MobileLink>
-          <MobileLink href="/properties/under-contract">Under Contract</MobileLink>
+          <MobileLink href="/properties/under-contract">
+            Under Contract
+          </MobileLink>
           <MobileLink href="/properties/sold">Sold</MobileLink>
           <MobileLink href="/sell">List Your Property</MobileLink>
 
@@ -178,8 +190,6 @@ export default function Nav() {
     </header>
   );
 }
-
-/* ---- subcomponents ---- */
 
 function MenuLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
