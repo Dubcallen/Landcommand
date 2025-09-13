@@ -8,34 +8,35 @@ export default function Nav() {
   const [openDropdown, setOpenDropdown] = useState<"about" | "properties" | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const aboutWrapRef = useRef<HTMLDivElement>(null);
-  const propsWrapRef = useRef<HTMLDivElement>(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const propsRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns when clicking outside
+  // close dropdowns when clicking outside
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function onDocClick(e: MouseEvent) {
       const t = e.target as Node;
       if (
-        aboutWrapRef.current &&
-        !aboutWrapRef.current.contains(t) &&
-        propsWrapRef.current &&
-        !propsWrapRef.current.contains(t)
+        aboutRef.current &&
+        !aboutRef.current.contains(t) &&
+        propsRef.current &&
+        !propsRef.current.contains(t)
       ) {
         setOpenDropdown(null);
       }
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
   return (
     <header className="absolute top-0 z-50 w-full bg-transparent select-none">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+      {/* 3-column grid keeps the logo perfectly centered regardless of left/right widths */}
+      <div className="mx-auto grid max-w-7xl grid-cols-3 items-center px-6 py-5">
         {/* LEFT (desktop) */}
-        <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
-          {/* ABOUT dropdown */}
+        <nav className="hidden md:flex items-center justify-start gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
+          {/* ABOUT */}
           <div
-            ref={aboutWrapRef}
+            ref={aboutRef}
             className="relative"
             onMouseEnter={() => setOpenDropdown("about")}
             onMouseLeave={() => setOpenDropdown(null)}
@@ -50,7 +51,6 @@ export default function Nav() {
             >
               ABOUT LAND COMMAND ▾
             </button>
-
             {openDropdown === "about" && (
               <div className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl">
                 <MenuLink href="/about/firm">Our Firm</MenuLink>
@@ -61,9 +61,9 @@ export default function Nav() {
             )}
           </div>
 
-          {/* PROPERTIES dropdown */}
+          {/* PROPERTIES */}
           <div
-            ref={propsWrapRef}
+            ref={propsRef}
             className="relative"
             onMouseEnter={() => setOpenDropdown("properties")}
             onMouseLeave={() => setOpenDropdown(null)}
@@ -78,7 +78,6 @@ export default function Nav() {
             >
               PROPERTIES ▾
             </button>
-
             {openDropdown === "properties" && (
               <div className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl">
                 <MenuLink href="/properties/available">Available</MenuLink>
@@ -90,8 +89,8 @@ export default function Nav() {
           </div>
         </nav>
 
-        {/* CENTER LOGO */}
-        <div className="flex justify-center">
+        {/* CENTER LOGO (always rendered) */}
+        <div className="flex items-center justify-center">
           <Link href="/" aria-label="Land Command — Home" className="block">
             <Image
               src="/sight_only.png"
@@ -104,46 +103,46 @@ export default function Nav() {
           </Link>
         </div>
 
-        {/* RIGHT (desktop) */}
-        <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
-          <Link className="hover:text-[#CBB26A] transition-colors" href="/search">
-            Search for Land
-          </Link>
-          <Link className="hover:text-[#CBB26A] transition-colors" href="/short-films">
-            Short Films
-          </Link>
-        </nav>
+        {/* RIGHT (desktop) + HAMBURGER (mobile) */}
+        <div className="flex items-center justify-end gap-6">
+          <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
+            <Link className="hover:text-[#CBB26A] transition-colors" href="/search">
+              Search for Land
+            </Link>
+            <Link className="hover:text-[#CBB26A] transition-colors" href="/short-films">
+              Short Films
+            </Link>
+          </nav>
 
-        {/* HAMBURGER (mobile) — inline SVG (no deps) */}
-        <button
-          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-white/90 hover:text-white focus:outline-none"
-          aria-label="Open menu"
-          onClick={() => setMobileOpen((v) => !v)}
-        >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          {/* Hamburger (visible < md) */}
+          <button
+            className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-white/90 hover:text-white focus:outline-none"
+            aria-label="Open menu"
+            onClick={() => setMobileOpen((v) => !v)}
           >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* MOBILE DRAWER */}
       <div
-        className={`
-          md:hidden overflow-hidden transition-[max-height] duration-300 ease-out
+        className={`md:hidden overflow-hidden transition-[max-height] duration-300 ease-out
           bg-[#1B1B1B]/95 backdrop-blur border-t border-white/10
-          ${mobileOpen ? "max-h-[420px]" : "max-h-0"}
-        `}
+          ${mobileOpen ? "max-h-[420px]" : "max-h-0"}`}
       >
         <div className="px-6 py-4 font-serif uppercase text-white text-sm">
           <p className="mb-2 text-white/60">ABOUT LAND COMMAND</p>
@@ -171,8 +170,6 @@ export default function Nav() {
     </header>
   );
 }
-
-/* ---------- subcomponents ---------- */
 
 function MenuLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
