@@ -8,14 +8,14 @@ const tiles = [
     href: "/sell",
     title: "List With Us",
     subtitle: "Unrivaled Marketing",
-    img: "/list.jpg", // stored in public/list.jpg
+    img: "/list.jpg", // stored in public/list-with-us.jpg
     cta: "Start Listing",
   },
   {
     href: "/short-films",
     title: "Short Films",
     subtitle: "Cinematic Reels",
-    img: "/films.jpg", // stored in public/films.jpg
+    img: "/films.jpg", // stored in public/short-films.jpg
     cta: "View Portfolio",
   },
   {
