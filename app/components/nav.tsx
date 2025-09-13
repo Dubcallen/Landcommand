@@ -1,91 +1,153 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
+import { Menu } from "lucide-react";
 
 export default function Nav() {
-  const [open, setOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const toggleDropdown = (menu: string) => {
+    setOpenDropdown(openDropdown === menu ? null : menu);
+  };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40">
-      <div className="mx-auto max-w-7xl px-5">
-        <nav className="mt-6 flex items-center justify-between rounded-2xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur">
-          {/* Left menu */}
-          <div className="flex items-center gap-8 text-[13px] uppercase tracking-[0.18em] text-white/85">
-            <Link href="/about" className="hover:text-white">About Land Command</Link>
-            <Link href="/properties/available" className="hover:text-white">Properties</Link>
+    <header className="absolute top-0 z-50 w-full bg-transparent">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+        {/* Left Menu */}
+        <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
+          {/* About Dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={() => setOpenDropdown("about")}
+            onMouseLeave={() => setOpenDropdown(null)}
+          >
+            <button className="hover:text-[#CBB26A]">About Land Command ▾</button>
+            {openDropdown === "about" && (
+              <div className="absolute left-0 mt-2 w-48 bg-[#1B1B1B] border border-white/10 rounded-lg shadow-lg">
+                <Link
+                  href="/about/firm"
+                  className="block px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  Our Firm
+                </Link>
+                <Link
+                  href="/about/process"
+                  className="block px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  Our Process
+                </Link>
+                <Link
+                  href="/about/press"
+                  className="block px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  Press
+                </Link>
+                <Link
+                  href="/about/stories"
+                  className="block px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  Stories
+                </Link>
+              </div>
+            )}
           </div>
 
-          {/* Center logo (hover → doubles size) */}
-          <div className="relative h-10 w-10">
-            <Link
-              href="/"
-              className="group block h-full w-full"
-              aria-label="Land Command — Home"
-            >
-              <Image
-                src="/sight_only.png"
-                alt="Land Command"
-                fill
-                sizes="40px"
-                priority
-                className="object-contain transition-transform duration-300 ease-out will-change-transform group-hover:scale-200"
-              />
-            </Link>
-          </div>
-
-          {/* Right menu */}
-          <div className="flex items-center gap-8 text-[13px] uppercase tracking-[0.18em] text-white/85">
-            <Link href="/search" className="hover:text-white">Search for Land</Link>
-            <Link href="/short-films" className="hover:text-white">Short Films</Link>
-
-            {/* Hamburger (kept minimal; matches your existing behavior) */}
-            <button
-              onClick={() => setOpen((v) => !v)}
-              aria-label="Open menu"
-              className="ml-2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/10 hover:bg-white/15"
-            >
-              <span className="block h-[2px] w-4 bg-white" />
-            </button>
+          {/* Properties Dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={() => setOpenDropdown("properties")}
+            onMouseLeave={() => setOpenDropdown(null)}
+          >
+            <button className="hover:text-[#CBB26A]">Properties ▾</button>
+            {openDropdown === "properties" && (
+              <div className="absolute left-0 mt-2 w-56 bg-[#1B1B1B] border border-white/10 rounded-lg shadow-lg">
+                <Link
+                  href="/properties/available"
+                  className="block px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  Available
+                </Link>
+                <Link
+                  href="/properties/under-contract"
+                  className="block px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  Under Contract
+                </Link>
+                <Link
+                  href="/properties/sold"
+                  className="block px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  Sold
+                </Link>
+                <Link
+                  href="/sell"
+                  className="block px-4 py-2 text-sm hover:bg-white/10"
+                >
+                  List Your Property
+                </Link>
+              </div>
+            )}
           </div>
         </nav>
+
+        {/* Logo Center */}
+        <div className="flex justify-center">
+          <Link href="/" className="block">
+            <Image
+              src="/sight_only.png"
+              alt="Land Command Logo"
+              width={90}
+              height={90}
+              className="transition-transform duration-300 hover:scale-125"
+              priority
+            />
+          </Link>
+        </div>
+
+        {/* Right Menu */}
+        <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
+          <Link href="/search" className="hover:text-[#CBB26A]">
+            Search for Land
+          </Link>
+          <Link href="/short-films" className="hover:text-[#CBB26A]">
+            Short Films
+          </Link>
+        </nav>
+
+        {/* Hamburger Mobile */}
+        <button
+          className="md:hidden text-white"
+          onClick={() => setMobileOpen(!mobileOpen)}
+        >
+          <Menu size={28} />
+        </button>
       </div>
 
-      {/* Simple drawer (unchanged logic; add links as needed) */}
-      {open && (
-        <div
-          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="absolute right-0 top-0 h-full w-[320px] border-l border-white/10 bg-[#171717] p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-6 flex items-center justify-between">
-              <span className="font-serif text-xl text-white/90">Menu</span>
-              <button
-                onClick={() => setOpen(false)}
-                aria-label="Close"
-                className="rounded-md bg-white/10 px-2 py-1 text-sm hover:bg-white/15"
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="grid gap-4 text-white/90">
-              <Link href="/about" onClick={() => setOpen(false)}>About Land Command</Link>
-              <Link href="/properties/available" onClick={() => setOpen(false)}>Properties</Link>
-              <Link href="/search" onClick={() => setOpen(false)}>Search for Land</Link>
-              <Link href="/short-films" onClick={() => setOpen(false)}>Short Films</Link>
-              <hr className="border-white/10 my-2" />
-              <Link href="/sell" onClick={() => setOpen(false)} className="text-[rgba(203,178,106,1)]">Sell Your Land</Link>
-              <Link href="/properties/available" onClick={() => setOpen(false)}>Buy Land</Link>
-            </div>
+      {/* Mobile Menu Drawer */}
+      {mobileOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-[#1B1B1B] border-t border-white/10">
+          <div className="flex flex-col p-4 font-serif uppercase text-white text-sm">
+            <Link href="/about/firm" className="py-2 hover:text-[#CBB26A]">
+              About Land Command
+            </Link>
+            <Link href="/properties/available" className="py-2 hover:text-[#CBB26A]">
+              Properties
+            </Link>
+            <Link href="/search" className="py-2 hover:text-[#CBB26A]">
+              Search for Land
+            </Link>
+            <Link href="/short-films" className="py-2 hover:text-[#CBB26A]">
+              Short Films
+            </Link>
+            <Link href="/sell" className="py-2 hover:text-[#CBB26A]">
+              List Your Property
+            </Link>
           </div>
         </div>
       )}
     </header>
   );
 }
-
