@@ -40,11 +40,12 @@ export default function Nav() {
 
   return (
     <header
-      className="absolute top-0 z-50 w-full bg-transparent select-none border-b-0 shadow-none"
+      className="lc-header absolute top-0 z-50 w-full bg-transparent select-none"
       style={{ borderBottom: "0 none", boxShadow: "none" }}
+      role="banner"
     >
       {/* 3 columns keep the logo exactly centered */}
-      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-5">
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-5 border-none">
         {/* LEFT (desktop) */}
         <nav className="hidden md:flex items-center justify-start gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
           {/* ABOUT */}
@@ -64,7 +65,7 @@ export default function Nav() {
             </button>
 
             {open === "about" && (
-              <div className="absolute left-0 top-full mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl z-50">
+              <div className="absolute left-0 top-full mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-none z-50">
                 <MenuLink href="/about/firm">Our Firm</MenuLink>
                 <MenuLink href="/about/process">Our Process</MenuLink>
                 <MenuLink href="/about/press">Press</MenuLink>
@@ -92,7 +93,7 @@ export default function Nav() {
             </button>
 
             {open === "properties" && (
-              <div className="absolute left-0 top-full mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl z-50">
+              <div className="absolute left-0 top-full mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-none z-50">
                 <MenuLink href="/properties/available">Available</MenuLink>
                 <MenuLink href="/properties/under-contract">
                   Under Contract
@@ -158,9 +159,10 @@ export default function Nav() {
 
       {/* DRAWER */}
       <div
-        className={`fixed inset-x-0 top-[72px] md:top-[84px] z-40 overflow-hidden border-t border-white/10 bg-[#1B1B1B]/95 backdrop-blur transition-[max-height] duration-300 ease-out ${
+        className={`fixed inset-x-0 top-[72px] md:top-[84px] z-40 overflow-hidden bg-[#1B1B1B]/95 backdrop-blur transition-[max-height] duration-300 ease-out ${
           drawer ? "max-h-[520px]" : "max-h-0"
         }`}
+        style={{ borderTop: "0", boxShadow: "none" }}
       >
         <div className="mx-auto max-w-7xl px-6 py-5 font-serif uppercase text-white text-sm">
           <p className="mb-2 text-white/60">ABOUT LAND COMMAND</p>
@@ -187,6 +189,15 @@ export default function Nav() {
           <MobileLink href="/short-films">Short Films</MobileLink>
         </div>
       </div>
+
+      {/* Global border/shadow kill-switch to remove any faint separator lines */}
+      <style jsx global>{`
+        .lc-header,
+        .lc-header * {
+          border: 0 !important;
+          box-shadow: none !important;
+        }
+      `}</style>
     </header>
   );
 }
