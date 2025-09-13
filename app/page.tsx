@@ -11,7 +11,7 @@ export const metadata = {
 export default function HomePage() {
   return (
     <main className="bg-[#1B1B1B] text-[#EFECE0]">
-      {/* HERO (video + logo + name + tagline + CTA row + category pill) */}
+      {/* HERO (video + name + tagline + CTA row + category pill) */}
       <section className="relative isolate min-h-screen w-full overflow-hidden">
         {/* Background video */}
         <video
@@ -26,15 +26,7 @@ export default function HomePage() {
 
         {/* Center branding */}
         <div className="relative z-10 flex flex-col items-center pt-28 text-center">
-          <Image
-            src="/sight_only.png"
-            alt="Land Command"
-            width={140}
-            height={140}
-            priority
-            className="mb-4"
-          />
-          {/* Thin luxury serif (Playfair 400 via layout.tsx) */}
+          {/* Removed the big logo here */}
           <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
             LAND COMMAND
           </h1>
@@ -42,24 +34,24 @@ export default function HomePage() {
             America&apos;s Premiere Land Specialists
           </p>
 
-          {/* Category line */}
+        {/* Category line */}
           <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
             LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; EQUESTRIAN &nbsp; | &nbsp; ESTATE
           </div>
 
-          {/* CTAs */}
+          {/* CTAs (renamed + linked) */}
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <a
               href="/properties/available"
               className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
             >
-              Exclusive Properties
+              Buy
             </a>
             <a
               href="/sell"
               className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-sans text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
             >
-              List Your Property
+              Sell
             </a>
           </div>
         </div>
@@ -67,7 +59,7 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
       </section>
 
-      {/* Featured Properties */}
+      {/* Featured Properties (unchanged) */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="font-serif text-3xl md:text-4xl">Featured Properties</h2>
@@ -78,7 +70,6 @@ export default function HomePage() {
             View All →
           </a>
         </div>
-        {/* Placeholder grid — swap to your data later */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <a
@@ -101,13 +92,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Covey Rise–style Feature Tiles (List With Us / Short Films / Resources) */}
+      {/* Covey Rise–style Feature Tiles (hover brighten + 25% scale) */}
       <FeatureTiles />
 
       {/* Pre-footer CTA band */}
       <CtaBand />
 
-      {/* Footer CTAs (unchanged) */}
+      {/* Footer */}
       <footer className="border-t border-white/10 bg-black/40">
         <div className="mx-auto max-w-6xl px-6 py-10">
           <div className="flex flex-wrap gap-4">
