@@ -8,18 +8,18 @@ export default function Nav() {
   const [openDropdown, setOpenDropdown] = useState<"about" | "properties" | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const aboutRef = useRef<HTMLDivElement>(null);
-  const propsRef = useRef<HTMLDivElement>(null);
+  const aboutWrapRef = useRef<HTMLDivElement>(null);
+  const propsWrapRef = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
+  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       const t = e.target as Node;
       if (
-        aboutRef.current &&
-        !aboutRef.current.contains(t) &&
-        propsRef.current &&
-        !propsRef.current.contains(t)
+        aboutWrapRef.current &&
+        !aboutWrapRef.current.contains(t) &&
+        propsWrapRef.current &&
+        !propsWrapRef.current.contains(t)
       ) {
         setOpenDropdown(null);
       }
@@ -33,11 +33,12 @@ export default function Nav() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
         {/* LEFT (desktop) */}
         <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
-          {/* ABOUT */}
+          {/* ABOUT dropdown */}
           <div
-            ref={aboutRef}
+            ref={aboutWrapRef}
             className="relative"
             onMouseEnter={() => setOpenDropdown("about")}
+            onMouseLeave={() => setOpenDropdown(null)}
           >
             <button
               onClick={() =>
@@ -51,10 +52,7 @@ export default function Nav() {
             </button>
 
             {openDropdown === "about" && (
-              <div
-                className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl"
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
+              <div className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl">
                 <MenuLink href="/about/firm">Our Firm</MenuLink>
                 <MenuLink href="/about/process">Our Process</MenuLink>
                 <MenuLink href="/about/press">Press</MenuLink>
@@ -63,11 +61,12 @@ export default function Nav() {
             )}
           </div>
 
-          {/* PROPERTIES */}
+          {/* PROPERTIES dropdown */}
           <div
-            ref={propsRef}
+            ref={propsWrapRef}
             className="relative"
             onMouseEnter={() => setOpenDropdown("properties")}
+            onMouseLeave={() => setOpenDropdown(null)}
           >
             <button
               onClick={() =>
@@ -81,10 +80,7 @@ export default function Nav() {
             </button>
 
             {openDropdown === "properties" && (
-              <div
-                className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl"
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
+              <div className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl">
                 <MenuLink href="/properties/available">Available</MenuLink>
                 <MenuLink href="/properties/under-contract">Under Contract</MenuLink>
                 <MenuLink href="/properties/sold">Sold</MenuLink>
@@ -94,7 +90,7 @@ export default function Nav() {
           </div>
         </nav>
 
-        {/* LOGO CENTER */}
+        {/* CENTER LOGO */}
         <div className="flex justify-center">
           <Link href="/" aria-label="Land Command — Home" className="block">
             <Image
@@ -118,7 +114,7 @@ export default function Nav() {
           </Link>
         </nav>
 
-        {/* HAMBURGER (mobile) */}
+        {/* HAMBURGER (mobile) — inline SVG (no deps) */}
         <button
           className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-white/90 hover:text-white focus:outline-none"
           aria-label="Open menu"
@@ -133,7 +129,6 @@ export default function Nav() {
             strokeWidth="1.75"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="transition-transform duration-200"
           >
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -177,13 +172,9 @@ export default function Nav() {
   );
 }
 
-function MenuLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+/* ---------- subcomponents ---------- */
+
+function MenuLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}
