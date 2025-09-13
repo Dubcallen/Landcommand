@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export const metadata = {
   title: "Land Command — America’s Premiere Land Specialists",
   description:
@@ -9,6 +11,7 @@ export default function HomePage() {
     <main className="bg-[#1B1B1B] text-[#EFECE0]">
       {/* HERO */}
       <section className="relative isolate min-h-screen w-full overflow-hidden">
+        {/* Background video */}
         <video
           src="/hero.mp4"
           autoPlay
@@ -19,22 +22,30 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-black/40" />
 
-        {/* Center stack with generous vertical rhythm */}
-        <div className="relative z-10 flex flex-col items-center pt-36 md:pt-40 text-center">
+        {/* Branding */}
+        <div className="relative z-10 flex flex-col items-center pt-28 text-center">
+          <Image
+            src="/sight_only.png"
+            alt="Land Command"
+            width={140}
+            height={140}
+            priority
+            className="mb-4"
+          />
           <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
             LAND COMMAND
           </h1>
-
-          <p className="mt-4 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
+          <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
             America&apos;s Premiere Land Specialists
           </p>
 
-          <div className="mt-7 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
+          {/* Categories */}
+          <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
             LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
           </div>
 
-          {/* Buy / Sell */}
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
+          {/* CTAs */}
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
             <a
               href="/properties/available"
               className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
@@ -53,29 +64,38 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
       </section>
 
-      {/* Featured Properties (bottom) */}
+      {/* Tiles Section (List, Films, Resources) */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-6 flex items-end justify-between">
-          <h2 className="font-serif text-3xl md:text-4xl">Featured Properties</h2>
-          <a href="/properties/available" className="text-sm text-white/80 hover:text-white">
-            View All →
-          </a>
+          <h2 className="font-serif text-3xl md:text-4xl">Explore Land Command</h2>
         </div>
-
-        {/* 3 cards — use your real images in /public. If missing, cards still show. */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { src: "/tile-1.jpg", title: "Riverbend Ridge", meta: "Lewis County, TN • 92± Acres" },
-            { src: "/tile-2.jpg", title: "Cedar Hollow Farm", meta: "Maury County, TN • 48± Acres" },
-            { src: "/tile-3.jpg", title: "Timberline Estate", meta: "Williamson County, TN • 26± Acres" },
+            {
+              src: "/list.jpg",
+              title: "List With Us",
+              meta: "Flat Fee • National Exposure",
+              link: "/sell",
+            },
+            {
+              src: "/films.jpg",
+              title: "Short Films",
+              meta: "Cinematic Reels • 4K Aerial",
+              link: "/short-films",
+            },
+            {
+              src: "/resources.jpg",
+              title: "Resources",
+              meta: "Expertise • Insights • Guidance",
+              link: "/resources",
+            },
           ].map((card, i) => (
             <a
               key={i}
-              href="/properties/available"
-              className="group overflow-hidden rounded-2xl border border-white/10 bg-black/40 transition-colors hover:bg-black/55"
+              href={card.link}
+              className="group overflow-hidden rounded-2xl border border-white/10 bg-black/40 hover:bg-black/55 transition-colors"
             >
-              <div className="relative aspect-[4/3] overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]">
-                {/* Only the image scales on hover */}
+              <div className="relative aspect-[4/3] overflow-hidden">
                 <img
                   src={card.src}
                   alt={card.title}
@@ -94,6 +114,29 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10 bg-black/40">
+        <div className="mx-auto max-w-6xl px-6 py-10">
+          <div className="flex flex-wrap gap-4">
+            <a
+              href="/sell"
+              className="rounded-xl border border-[rgba(203,178,106,0.6)] bg-[rgba(203,178,106,0.9)] px-6 py-3 font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
+            >
+              List Your Property
+            </a>
+            <a
+              href="/contact"
+              className="rounded-xl border border-white/25 px-6 py-3 text-white hover:bg-white/10"
+            >
+              Speak with a Specialist
+            </a>
+          </div>
+          <p className="mt-4 text-sm text-white/60">
+            © {new Date().getFullYear()} Land Command. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
