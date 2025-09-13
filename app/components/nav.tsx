@@ -2,34 +2,47 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Nav() {
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<"about" | "properties" | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // close dropdowns when focusing elsewhere (keyboard users)
-  const closeDropdowns = () => setOpenDropdown(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const propsRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      const t = e.target as Node;
+      if (
+        aboutRef.current &&
+        !aboutRef.current.contains(t) &&
+        propsRef.current &&
+        !propsRef.current.contains(t)
+      ) {
+        setOpenDropdown(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   return (
-    <header
-      className="
-        absolute top-0 z-50 w-full
-        bg-transparent
-        select-none
-      "
-      onMouseLeave={closeDropdowns}
-    >
+    <header className="absolute top-0 z-50 w-full bg-transparent select-none">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-        {/* LEFT NAV (desktop) */}
+        {/* LEFT (desktop) */}
         <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
-          {/* About Dropdown */}
+          {/* ABOUT */}
           <div
+            ref={aboutRef}
             className="relative"
             onMouseEnter={() => setOpenDropdown("about")}
-            onMouseLeave={() => setOpenDropdown(null)}
           >
             <button
+              onClick={() =>
+                setOpenDropdown((v) => (v === "about" ? null : "about"))
+              }
               className="hover:text-[#CBB26A] transition-colors"
               aria-haspopup="true"
               aria-expanded={openDropdown === "about"}
@@ -39,11 +52,8 @@ export default function Nav() {
 
             {openDropdown === "about" && (
               <div
-                className="
-                  absolute left-0 mt-2 w-56
-                  rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur
-                  shadow-xl
-                "
+                className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl"
+                onMouseLeave={() => setOpenDropdown(null)}
               >
                 <MenuLink href="/about/firm">Our Firm</MenuLink>
                 <MenuLink href="/about/process">Our Process</MenuLink>
@@ -53,13 +63,16 @@ export default function Nav() {
             )}
           </div>
 
-          {/* Properties Dropdown */}
+          {/* PROPERTIES */}
           <div
+            ref={propsRef}
             className="relative"
             onMouseEnter={() => setOpenDropdown("properties")}
-            onMouseLeave={() => setOpenDropdown(null)}
           >
             <button
+              onClick={() =>
+                setOpenDropdown((v) => (v === "properties" ? null : "properties"))
+              }
               className="hover:text-[#CBB26A] transition-colors"
               aria-haspopup="true"
               aria-expanded={openDropdown === "properties"}
@@ -69,11 +82,8 @@ export default function Nav() {
 
             {openDropdown === "properties" && (
               <div
-                className="
-                  absolute left-0 mt-2 w-56
-                  rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur
-                  shadow-xl
-                "
+                className="absolute left-0 mt-2 w-56 rounded-lg border border-white/10 bg-[#1B1B1B]/95 backdrop-blur shadow-xl"
+                onMouseLeave={() => setOpenDropdown(null)}
               >
                 <MenuLink href="/properties/available">Available</MenuLink>
                 <MenuLink href="/properties/under-contract">Under Contract</MenuLink>
@@ -84,7 +94,7 @@ export default function Nav() {
           </div>
         </nav>
 
-        {/* CENTER LOGO */}
+        {/* LOGO CENTER */}
         <div className="flex justify-center">
           <Link href="/" aria-label="Land Command — Home" className="block">
             <Image
@@ -98,20 +108,17 @@ export default function Nav() {
           </Link>
         </div>
 
-        {/* RIGHT NAV (desktop) */}
+        {/* RIGHT (desktop) */}
         <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
           <Link className="hover:text-[#CBB26A] transition-colors" href="/search">
             Search for Land
           </Link>
-          <Link
-            className="hover:text-[#CBB26A] transition-colors"
-            href="/short-films"
-          >
+          <Link className="hover:text-[#CBB26A] transition-colors" href="/short-films">
             Short Films
           </Link>
         </nav>
 
-        {/* HAMBURGER (mobile) - inline SVG, no dependencies */}
+        {/* HAMBURGER (mobile) */}
         <button
           className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-white/90 hover:text-white focus:outline-none"
           aria-label="Open menu"
@@ -138,8 +145,7 @@ export default function Nav() {
       {/* MOBILE DRAWER */}
       <div
         className={`
-          md:hidden overflow-hidden transition-[max-height]
-          duration-300 ease-out
+          md:hidden overflow-hidden transition-[max-height] duration-300 ease-out
           bg-[#1B1B1B]/95 backdrop-blur border-t border-white/10
           ${mobileOpen ? "max-h-[420px]" : "max-h-0"}
         `}
@@ -171,8 +177,6 @@ export default function Nav() {
   );
 }
 
-/* ---------- small subcomponents for consistency ---------- */
-
 function MenuLink({
   href,
   children,
@@ -183,10 +187,7 @@ function MenuLink({
   return (
     <Link
       href={href}
-      className="
-        block px-4 py-2 text-sm text-white/90
-        hover:bg-white/10 hover:text-white transition
-      "
+      className="block px-4 py-2 text-sm text-white/90 hover:bg-white/10 hover:text-white transition"
     >
       {children}
     </Link>
