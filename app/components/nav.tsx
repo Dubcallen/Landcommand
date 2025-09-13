@@ -47,7 +47,7 @@ export default function Nav() {
               aria-haspopup="true"
               aria-expanded={openDropdown === "about"}
             >
-              About Land Command ▾
+              ABOUT LAND COMMAND ▾
             </button>
 
             {openDropdown === "about" && (
@@ -77,7 +77,7 @@ export default function Nav() {
               aria-haspopup="true"
               aria-expanded={openDropdown === "properties"}
             >
-              Properties ▾
+              PROPERTIES ▾
             </button>
 
             {openDropdown === "properties" && (
@@ -151,7 +151,7 @@ export default function Nav() {
         `}
       >
         <div className="px-6 py-4 font-serif uppercase text-white text-sm">
-          <p className="mb-2 text-white/60">About Land Command</p>
+          <p className="mb-2 text-white/60">ABOUT LAND COMMAND</p>
           <MobileLink href="/about/firm">Our Firm</MobileLink>
           <MobileLink href="/about/process">Our Process</MobileLink>
           <MobileLink href="/about/press">Press</MobileLink>
@@ -159,7 +159,7 @@ export default function Nav() {
 
           <div className="mt-4 h-px bg-white/10" />
 
-          <p className="mt-4 mb-2 text-white/60">Properties</p>
+          <p className="mt-4 mb-2 text-white/60">PROPERTIES</p>
           <MobileLink href="/properties/available">Available</MobileLink>
           <MobileLink href="/properties/under-contract">Under Contract</MobileLink>
           <MobileLink href="/properties/sold">Sold</MobileLink>
