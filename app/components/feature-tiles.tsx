@@ -8,21 +8,21 @@ const tiles = [
     href: "/sell",
     title: "List With Us",
     subtitle: "Unrivaled Marketing",
-    img: "/tiles/list.jpg",
+    img: "/list.jpg", // stored in public/list.jpg
     cta: "Start Listing",
   },
   {
     href: "/short-films",
     title: "Short Films",
     subtitle: "Cinematic Reels",
-    img: "/tiles/films.jpg",
+    img: "/films.jpg", // stored in public/films.jpg
     cta: "View Portfolio",
   },
   {
     href: "/resources",
     title: "Resources",
     subtitle: "Expert Tips & Insights",
-    img: "/tiles/resources.jpg",
+    img: "/resources.jpg", // stored in public/resources.jpg
     cta: "Access Land Expertise",
   },
 ];
@@ -44,7 +44,7 @@ export default function FeatureTiles() {
                 alt={t.title}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-300 ease-out group-hover:scale-125"
+                className="object-cover transition-transform duration-300 ease-out group-hover:scale-125 group-hover:brightness-110"
                 priority={false}
               />
               {/* Dark overlay */}
