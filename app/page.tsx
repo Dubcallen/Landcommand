@@ -1,17 +1,8 @@
-import Image from "next/image";
-
-export const metadata = {
-  title: "Land Command — America’s Premiere Land Specialists",
-  description:
-    "Exclusive land, farm, investment, and estate opportunities. List your property, commission short films and stories, and explore financing.",
-};
-
 export default function HomePage() {
   return (
     <main className="bg-[#1B1B1B] text-[#EFECE0]">
-      {/* HERO (video + logo + name + tagline + CTA row + category pill) */}
+      {/* HERO (video + name + tagline + CTA row + category pill) */}
       <section className="relative isolate min-h-screen w-full overflow-hidden">
-        {/* Background video */}
         <video
           src="/hero.mp4"
           autoPlay
@@ -24,15 +15,8 @@ export default function HomePage() {
 
         {/* Center branding */}
         <div className="relative z-10 flex flex-col items-center pt-28 text-center">
-          <Image
-            src="/sight_only.png"
-            alt="Land Command"
-            width={140}
-            height={140}
-            priority
-            className="mb-4"
-          />
-          {/* Cormorant Garamond via font-serif */}
+          {/* Removed big logo, spacing preserved */}
+          <div className="mb-4" />
           <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
             LAND COMMAND
           </h1>
@@ -40,12 +24,10 @@ export default function HomePage() {
             America&apos;s Premiere Land Specialists
           </p>
 
-          {/* Category line */}
           <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
-            LAND &nbsp; | &nbsp; RANCH &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
+            LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
           </div>
 
-          {/* CTAs (unchanged) */}
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <a
               href="/properties/available"
@@ -64,8 +46,6 @@ export default function HomePage() {
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
       </section>
-
-      {/* (Rest of your homepage stays exactly as-is) */}
     </main>
   );
 }
