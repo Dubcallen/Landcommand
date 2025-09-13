@@ -1,4 +1,6 @@
 import Image from "next/image";
+import FeatureTiles from "./components/feature-tiles";
+import CtaBand from "./components/cta-band";
 
 export const metadata = {
   title: "Land Command — America’s Premiere Land Specialists",
@@ -137,7 +139,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="font-serif text-3xl md:text-4xl">Stories</h2>
-          <a
+        <a
             href="/about/stories"
             className="text-sm text-white/80 hover:text-white"
           >
@@ -171,6 +173,9 @@ export default function HomePage() {
           </a>
         </div>
       </section>
+
+      {/* --- NEW: Covey Rise-style Feature Tiles --- */}
+      <FeatureTiles />
 
       {/* Sell Your Land (Listing Fees) */}
       <section className="mx-auto max-w-6xl px-6 py-16">
@@ -244,7 +249,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer CTAs */}
+      {/* --- NEW: pre-footer CTA band (optional) --- */}
+      <CtaBand />
+
+      {/* Footer CTAs (kept exactly as you have them) */}
       <footer className="border-t border-white/10 bg-black/40">
         <div className="mx-auto max-w-6xl px-6 py-10">
           <div className="flex flex-wrap gap-4">
@@ -269,3 +277,4 @@ export default function HomePage() {
     </main>
   );
 }
+
