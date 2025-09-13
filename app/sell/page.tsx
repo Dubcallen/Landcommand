@@ -1,187 +1,289 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const GOLD = "rgba(203,178,106,0.9)";
-const GOLD_BORDER = "rgba(203,178,106,0.75)";
-const IVORY = "rgba(239,236,224,1)";
-const IVORY_BORDER = "rgba(239,236,224,0.6)";
+type FormState = {
+  name: string;
+  email: string;
+  phone: string;
+  state: string;
+  county: string;
+  acreage: string;
+  price: string;
+  timeline: "immediately" | "30-60" | "60-90" | "unsure";
+  mediaUrl?: string;
+  notes?: string;
+  agree: boolean;
+};
 
-type PackageKey = "basic" | "featured" | "featured_reel" | "featured_story";
+const GOLD = "#CBB26A";
 
-export default function SellPage() {
-  const [pkg, setPkg] = useState<PackageKey>("basic");
+export default function SellIntakePage() {
+  const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  const packages: Record<PackageKey, { title: string; price: number; features: string[] }> = {
-    basic: {
-      title: "Basic Listing",
-      price: 800,
-      features: [
-        "Listing on LandCommand.ai",
-        "Standard Photo Gallery",
-        "Inquiry Routing to Seller",
-      ],
-    },
-    featured: {
-      title: "Featured Listing",
-      price: 1200,
-      features: [
-        "Homepage Featured Placement",
-        "Priority in Search",
-        "Enhanced Photo Gallery",
-      ],
-    },
-    featured_reel: {
-      title: "Featured + Reel",
-      price: 5800,
-      features: [
-        "Everything in Featured",
-        "Cinematic Property Reel (1–2 min)",
-        "On-Site Filming & Post-Production",
-      ],
-    },
-    featured_story: {
-      title: "Featured + Story",
-      price: 20800,
-      features: [
-        "Everything in Featured",
-        "Long-Form Editorial Story",
-        "Premium Photo Essay & Layout",
-      ],
-    },
-  };
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    email: "",
+    phone: "",
+    state: "",
+    county: "",
+    acreage: "",
+    price: "",
+    timeline: "immediately",
+    mediaUrl: "",
+    notes: "",
+    agree: false,
+  });
 
-  const active = packages[pkg];
+  const onChange =
+    (key: keyof FormState) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const value =
+        e.currentTarget.type === "checkbox"
+          ? (e.currentTarget as HTMLInputElement).checked
+          : e.currentTarget.value;
+      setForm((f) => ({ ...f, [key]: value }));
+    };
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+
+    if (!form.agree) {
+      setErr("Please accept the terms to continue.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const leadId = crypto.randomUUID();
+      const res = await fetch("/api/sell", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, leadId }),
+      });
+
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(t || "Request failed");
+      }
+
+      // redirect to Packages page with leadId for continuity
+      router.push(`/packages?lead=${encodeURIComponent(leadId)}`);
+    } catch (e: any) {
+      setErr(e?.message ?? "Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[#1B1B1B] text-[#EFECE0]">
-      {/* Hero */}
-      <section className="relative isolate overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-[url('/sell-hero.jpg')] bg-cover bg-center opacity-60" />
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
-        </div>
-        <div className="mx-auto max-w-6xl px-6 py-28 text-center">
-          <div className="inline-flex rounded-full border border-white/20 bg-black/30 px-5 py-1.5 backdrop-blur">
-            <span className="text-[12px] uppercase tracking-[0.24em] text-white/90">
-              List Your Property
-            </span>
-          </div>
-          <h1 className="mt-6 text-4xl font-serif font-semibold">Flat-Fee Listing Packages</h1>
-          <p className="mx-auto mt-3 max-w-2xl text-white/80">
-            Transparent pricing. Premium presentation. Keep control of your sale.
-          </p>
-        </div>
-      </section>
+      <section className="mx-auto w-full max-w-[980px] px-6 py-16">
+        <h1 className="font-serif text-4xl md:text-5xl">List Your Land</h1>
+        <p className="mt-3 max-w-2xl text-white/75">
+          Tell us about your property. We’ll review and get right back to you.
+          After submitting, you’ll be taken to our packages page to choose the
+          level of marketing that fits your goals.
+        </p>
 
-      {/* Packages + Checkout */}
-      <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-16 md:grid-cols-3">
-        {/* Package picker */}
-        <div className="md:col-span-1">
-          <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
-            <h2 className="mb-3 text-lg font-semibold">Choose a Package</h2>
-            <div className="space-y-2">
-              {Object.entries(packages).map(([key, val]) => (
-                <button
-                  key={key}
-                  onClick={() => setPkg(key as PackageKey)}
-                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition
-                    ${pkg === key
-                      ? "border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.08)]"
-                      : "border-white/10 hover:bg-white/5"}`}
-                >
-                  <div>
-                    <div className="font-medium">{val.title}</div>
-                    <div className="text-sm text-white/70">${val.price.toLocaleString()}</div>
-                  </div>
-                  <div className="text-xs text-white/60">Select</div>
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="mt-10 rounded-2xl border border-white/10 bg-black/40 p-6 md:p-8">
+          <form onSubmit={onSubmit} className="grid gap-6 md:grid-cols-2">
+            {/* Contact */}
+            <Field label="Your Name" required>
+              <input
+                type="text"
+                className="input"
+                value={form.name}
+                onChange={onChange("name")}
+                required
+              />
+            </Field>
+            <Field label="Email" required>
+              <input
+                type="email"
+                className="input"
+                value={form.email}
+                onChange={onChange("email")}
+                required
+              />
+            </Field>
+            <Field label="Phone" required>
+              <input
+                type="tel"
+                className="input"
+                value={form.phone}
+                onChange={onChange("phone")}
+                required
+              />
+            </Field>
 
-          <div className="mt-6 rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
-            <h3 className="mb-2 text-sm uppercase tracking-[0.16em] text-white/60">Need Cinematics?</h3>
-            <p className="text-sm text-white/80">
-              Add a <strong>Reel</strong> for $5,000 or commission a premium <strong>Story</strong> for $20,000.
-            </p>
-            <div className="mt-3 flex gap-3">
-              <a
-                href="/short-films"
-                className="inline-flex items-center rounded-md border px-4 py-2"
-                style={{ borderColor: GOLD_BORDER, backgroundColor: GOLD, color: "#1B1B1B" }}
+            {/* Location */}
+            <Field label="State" required>
+              <input
+                type="text"
+                className="input"
+                placeholder="e.g., TN"
+                value={form.state}
+                onChange={onChange("state")}
+                required
+              />
+            </Field>
+            <Field label="County" required>
+              <input
+                type="text"
+                className="input"
+                placeholder="e.g., Williamson"
+                value={form.county}
+                onChange={onChange("county")}
+                required
+              />
+            </Field>
+
+            {/* Property basics */}
+            <Field label="Acreage" required>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                className="input"
+                placeholder="e.g., 45"
+                value={form.acreage}
+                onChange={onChange("acreage")}
+                required
+              />
+            </Field>
+            <Field label="Asking Price (USD)" required>
+              <input
+                type="number"
+                min={0}
+                step="100"
+                className="input"
+                placeholder="e.g., 650000"
+                value={form.price}
+                onChange={onChange("price")}
+                required
+              />
+            </Field>
+
+            <Field label="Timeline" required>
+              <select
+                className="input"
+                value={form.timeline}
+                onChange={onChange("timeline")}
+                required
               >
-                View Reels
-              </a>
-              <a
-                href="/about/stories"
-                className="inline-flex items-center rounded-md border px-4 py-2 text-[rgba(239,236,224,1)] hover:bg-[rgba(239,236,224,0.08)]"
-                style={{ borderColor: IVORY_BORDER }}
-              >
-                View Stories
-              </a>
+                <option value="immediately">Immediately</option>
+                <option value="30-60">30–60 days</option>
+                <option value="60-90">60–90 days</option>
+                <option value="unsure">Unsure</option>
+              </select>
+            </Field>
+
+            <Field label="Photos/Video Link (optional)">
+              <input
+                type="url"
+                className="input"
+                placeholder="https://drive.google.com/…"
+                value={form.mediaUrl}
+                onChange={onChange("mediaUrl")}
+              />
+            </Field>
+
+            <div className="md:col-span-2">
+              <Field label="Notes (optional)">
+                <textarea
+                  rows={5}
+                  className="input resize-y"
+                  placeholder="Tell us anything else helpful…"
+                  value={form.notes}
+                  onChange={onChange("notes")}
+                />
+              </Field>
             </div>
-          </div>
-        </div>
 
-        {/* Features */}
-        <div className="md:col-span-1">
-          <div className="rounded-2xl border border-white/10 bg-black/40 p-6 backdrop-blur">
-            <h2 className="text-2xl font-serif font-semibold">{active.title}</h2>
-            <p className="mt-1 text-white/70">${active.price.toLocaleString()}</p>
-            <ul className="mt-4 space-y-2 text-white/90">
-              {active.features.map((f) => (
-                <li key={f} className="flex items-start gap-2">
-                  <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-white/70" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+            <div className="md:col-span-2 flex items-start gap-3">
+              <input
+                id="agree"
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-white/30 bg-transparent"
+                checked={form.agree}
+                onChange={onChange("agree")}
+              />
+              <label htmlFor="agree" className="text-sm text-white/80">
+                I agree that Land Command may contact me about this submission and
+                I accept the{" "}
+                <a href="/terms" className="underline hover:text-white">
+                  Terms
+                </a>{" "}
+                &{" "}
+                <a href="/privacy" className="underline hover:text-white">
+                  Privacy Policy
+                </a>
+                .
+              </label>
+            </div>
 
-        {/* Seller intake + (stub) checkout */}
-        <div className="md:col-span-1">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("In production: connect Stripe checkout & persist form.");
-            }}
-            className="rounded-2xl border border-white/10 bg-black/40 p-6 backdrop-blur"
-          >
-            <h2 className="mb-4 text-lg font-semibold">Property Details</h2>
-            <div className="grid grid-cols-1 gap-3">
-              <input className="rounded-md border border-white/10 bg-black/30 px-3 py-2 outline-none placeholder-white/50"
-                     placeholder="Property Title" required />
-              <div className="grid grid-cols-2 gap-3">
-                <input className="rounded-md border border-white/10 bg-black/30 px-3 py-2 outline-none placeholder-white/50"
-                       placeholder="State (e.g., TN)" required />
-                <input className="rounded-md border border-white/10 bg-black/30 px-3 py-2 outline-none placeholder-white/50"
-                       placeholder="County" required />
+            {err && (
+              <div className="md:col-span-2 rounded-lg border border-red-400/50 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                {err}
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <input type="number" className="rounded-md border border-white/10 bg-black/30 px-3 py-2 outline-none placeholder-white/50"
-                       placeholder="Acreage" />
-                <input type="number" className="rounded-md border border-white/10 bg-black/30 px-3 py-2 outline-none placeholder-white/50"
-                       placeholder="Price (USD)" />
-              </div>
-              <textarea rows={4} className="rounded-md border border-white/10 bg-black/30 px-3 py-2 outline-none placeholder-white/50"
-                        placeholder="Description" />
-              <input className="rounded-md border border-white/10 bg-black/30 px-3 py-2 outline-none placeholder-white/50"
-                     placeholder="Photo/Video Links (optional)" />
+            )}
+
+            <div className="md:col-span-2 flex flex-wrap gap-3">
               <button
                 type="submit"
-                className="mt-2 inline-flex items-center justify-center rounded-md border px-5 py-2.5 font-medium"
-                style={{ borderColor: GOLD_BORDER, backgroundColor: GOLD, color: "#1B1B1B", boxShadow: "0 1px 0 rgba(255,255,255,0.25) inset" }}
+                disabled={submitting}
+                className="rounded-xl border border-[rgba(203,178,106,0.6)] bg-[rgba(203,178,106,0.92)] px-6 py-3 text-[15px] font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)] disabled:opacity-60"
               >
-                Start Listing — ${active.price.toLocaleString()}
+                {submitting ? "Submitting…" : "Submit & Continue"}
               </button>
+              <a
+                href="/"
+                className="rounded-xl border border-white/25 px-6 py-3 text-white hover:bg-white/10"
+              >
+                Cancel
+              </a>
             </div>
-            <p className="mt-3 text-xs text-white/60">You’ll be taken to secure checkout. We’ll email instructions after payment.</p>
           </form>
         </div>
+
+        <style jsx global>{`
+          .input {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(0, 0, 0, 0.25);
+            padding: 10px 12px;
+            color: #efece0;
+            outline: none;
+          }
+          .input:focus {
+            border-color: rgba(255, 255, 255, 0.35);
+          }
+        `}</style>
       </section>
     </main>
+  );
+}
+
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <div className="mb-2 text-[12px] uppercase tracking-[0.22em] text-white/70">
+        {label} {required && <span className="text-white/60">*</span>}
+      </div>
+      {children}
+    </label>
   );
 }
