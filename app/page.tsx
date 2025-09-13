@@ -19,22 +19,22 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-black/40" />
 
-        <div className="relative z-10 flex flex-col items-center pt-28 text-center">
-          {/* (No large hero logo) */}
+        {/* Center stack with generous vertical rhythm */}
+        <div className="relative z-10 flex flex-col items-center pt-36 md:pt-40 text-center">
           <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
             LAND COMMAND
           </h1>
 
-          <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
+          <p className="mt-4 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
             America&apos;s Premiere Land Specialists
           </p>
 
-          <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
+          <div className="mt-7 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
             LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
           </div>
 
-          {/* CTAs (renamed + correct destinations) */}
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
+          {/* Buy / Sell */}
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
             <a
               href="/properties/available"
               className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
@@ -53,7 +53,7 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
       </section>
 
-      {/* === Featured Properties (restored bottom of page) === */}
+      {/* Featured Properties (bottom) */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="font-serif text-3xl md:text-4xl">Featured Properties</h2>
@@ -62,7 +62,7 @@ export default function HomePage() {
           </a>
         </div>
 
-        {/* 3-card grid. Images pulled from /public (tile-1.jpg etc). Only the IMAGE scales on hover. */}
+        {/* 3 cards — use your real images in /public. If missing, cards still show. */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[
             { src: "/tile-1.jpg", title: "Riverbend Ridge", meta: "Lewis County, TN • 92± Acres" },
@@ -74,12 +74,13 @@ export default function HomePage() {
               href="/properties/available"
               className="group overflow-hidden rounded-2xl border border-white/10 bg-black/40 transition-colors hover:bg-black/55"
             >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                {/* Only the image scales */}
+              <div className="relative aspect-[4/3] overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]">
+                {/* Only the image scales on hover */}
                 <img
                   src={card.src}
                   alt={card.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  loading="lazy"
                 />
               </div>
               <div className="p-5">
