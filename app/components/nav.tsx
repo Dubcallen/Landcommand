@@ -44,10 +44,63 @@ export default function Nav() {
       style={{ borderBottom: "0 none", boxShadow: "none" }}
       role="banner"
     >
-      {/* 3 columns keep the logo exactly centered */}
-      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-5 border-none">
+      {/* ----------------- MOBILE BAR (md:hidden) ----------------- */}
+      <div
+        className="
+          mx-auto block max-w-7xl px-4 md:hidden
+          pt-[calc(env(safe-area-inset-top)+8px)] pb-3
+          relative
+        "
+      >
+        {/* 3-cell row: [spacer | centered logo | hamburger] */}
+        <div className="flex items-center justify-between">
+          {/* spacer (same width as hamburger) to keep logo perfectly centered */}
+          <span className="inline-block w-10" aria-hidden="true" />
+
+          {/* centered logo */}
+          <Link
+            href="/"
+            aria-label="Land Command — Home"
+            className="mx-auto block"
+          >
+            <Image
+              src="/sight_only.png"
+              alt="Land Command"
+              width={72}
+              height={72}
+              priority
+              className="transition-transform duration-300 will-change-transform hover:scale-125"
+            />
+          </Link>
+
+          {/* right-aligned hamburger (width matches spacer) */}
+          <button
+            className="inline-flex w-10 items-center justify-end text-white/90 hover:text-white focus:outline-none"
+            aria-label="Open menu"
+            onClick={() => setDrawer((v) => !v)}
+          >
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* ----------------- DESKTOP BAR (hidden below md) ----------------- */}
+      <div className="mx-auto hidden max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-5 md:grid">
         {/* LEFT (desktop) */}
-        <nav className="hidden md:flex items-center justify-start gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
+        <nav className="flex items-center justify-start gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
           {/* ABOUT */}
           <div
             ref={aboutRef}
@@ -105,7 +158,7 @@ export default function Nav() {
           </div>
         </nav>
 
-        {/* CENTER LOGO — perfectly centered */}
+        {/* CENTER LOGO (desktop) */}
         <div className="flex items-center justify-center">
           <Link href="/" aria-label="Land Command — Home" className="block">
             <Image
@@ -119,7 +172,7 @@ export default function Nav() {
           </Link>
         </div>
 
-        {/* RIGHT (desktop) + HAMBURGER (always visible) */}
+        {/* RIGHT (desktop) */}
         <div className="flex items-center justify-end gap-8">
           <nav className="hidden md:flex items-center gap-10 font-serif text-sm uppercase tracking-[0.18em] text-white">
             <Link className="hover:text-[#CBB26A] transition-colors" href="/search">
@@ -133,7 +186,7 @@ export default function Nav() {
             </Link>
           </nav>
 
-          {/* Hamburger is visible on all sizes */}
+          {/* We keep a hamburger on desktop too (optional, harmless) */}
           <button
             className="inline-flex items-center justify-center rounded-md p-2 text-white/90 hover:text-white focus:outline-none"
             aria-label="Open menu"
@@ -157,12 +210,17 @@ export default function Nav() {
         </div>
       </div>
 
-      {/* DRAWER */}
+      {/* ----------------- DRAWER (shared) ----------------- */}
       <div
-        className={`fixed inset-x-0 top-[72px] md:top-[84px] z-40 overflow-hidden bg-[#1B1B1B]/95 backdrop-blur transition-[max-height] duration-300 ease-out ${
-          drawer ? "max-h-[520px]" : "max-h-0"
-        }`}
-        style={{ borderTop: "0", boxShadow: "none" }}
+        className={`fixed inset-x-0 z-40 overflow-hidden bg-[#1B1B1B]/95 backdrop-blur transition-[max-height] duration-300 ease-out
+        ${drawer ? "max-h-[520px]" : "max-h-0"}
+        `}
+        // Align drawer just under the bars (mobile ~64–76px, desktop ~84px)
+        style={{
+          top: "72px",
+          borderTop: "0",
+          boxShadow: "none",
+        }}
       >
         <div className="mx-auto max-w-7xl px-6 py-5 font-serif uppercase text-white text-sm">
           <p className="mb-2 text-white/60">ABOUT LAND COMMAND</p>
@@ -190,7 +248,7 @@ export default function Nav() {
         </div>
       </div>
 
-      {/* Global border/shadow kill-switch to remove any faint separator lines */}
+      {/* Global border/shadow kill-switch */}
       <style jsx global>{`
         .lc-header,
         .lc-header * {
@@ -231,3 +289,4 @@ function MobileLink({
     </Link>
   );
 }
+
