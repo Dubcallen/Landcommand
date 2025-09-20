@@ -5,8 +5,11 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function Hero() {
+  // ⬇️ Add a version param to bust caches for hero.mp4 (update the value whenever you swap the file)
+  const VER = "?v=2025-09-20-1";
+
   // Playlist & timing
-  const videos = ["/hero.mp4", "/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
+  const videos = ["/hero.mp4" + VER, "/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
   const ROTATE_MS = 6000; // rotate every 6s
   const FADE_MS = 600;    // crossfade duration in ms
 
@@ -38,14 +41,12 @@ export default function Hero() {
 
     if (incoming === 0) {
       setSrcA(videos[nextIdx]);
-      // ensure src applies before toggling opacity
       requestAnimationFrame(() => setActiveLayer(0));
     } else {
       setSrcB(videos[nextIdx]);
       requestAnimationFrame(() => setActiveLayer(1));
     }
 
-    // pause the other layer after fade
     setTimeout(() => {
       const outgoingRef = incoming === 0 ? videoBRef.current : videoARef.current;
       outgoingRef?.pause?.();
@@ -113,39 +114,17 @@ export default function Hero() {
 
       {/* Center stack (unchanged) */}
       <div className="relative z-10 flex flex-col items-center pt-28 text-center">
-        {/* spacer to preserve rhythm */}
         <div className="h-[120px] md:h-[140px]" aria-hidden />
-
-        <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
-          LAND COMMAND
-        </h1>
-
-        {/* Tagline exactly as on your site */}
+        <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">LAND COMMAND</h1>
         <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
           CINEMATIC STORYTELLING. AI PRECISION. FASTER SALES.
         </p>
-
-        {/* Categories (unchanged) */}
         <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
           LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
         </div>
-
-        {/* CTAs (unchanged) */}
         <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <Link
-            href="/properties/available"
-            className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
-            aria-label="Browse available properties"
-          >
-            Buy
-          </Link>
-          <Link
-            href="/sell"
-            className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-sans text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
-            aria-label="List your property with Land Command"
-          >
-            Sell
-          </Link>
+          <Link href="/properties/available" className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10" aria-label="Browse available properties">Buy</Link>
+          <Link href="/sell" className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-sans text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]" aria-label="List your property with Land Command">Sell</Link>
         </div>
       </div>
 
@@ -153,3 +132,4 @@ export default function Hero() {
     </section>
   );
 }
+
