@@ -1,28 +1,44 @@
+// app/page.tsx
+
 export const metadata = {
-  title: "Land Command — America’s Premiere Land Specialists",
+  title: "Land Command — America’s Premier Land Specialists",
   description:
     "Exclusive land, farm, investment, and estate opportunities. List your property, commission short films and stories, and explore financing.",
 };
 
+import Image from "next/image";
+import Link from "next/link";
+
 export default function HomePage() {
+  const year = new Date().getFullYear();
+
+  // Array of hero videos (keep hero.mp4 as-is)
+  const heroVideos = ["/hero.mp4", "/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
+
+  // Pick one at random on each render
+  const randomVideo =
+    heroVideos[Math.floor(Math.random() * heroVideos.length)];
+
   return (
     <main className="bg-[#1B1B1B] text-[#EFECE0]">
       {/* HERO */}
       <section className="relative isolate min-h-screen w-full overflow-hidden">
         <video
-          src="/hero.mp4"
+          key={randomVideo}
+          src={randomVideo}
           autoPlay
           muted
           loop
           playsInline
+          poster="/hero_poster.jpg"
           className="absolute inset-0 h-full w-full object-cover"
+          aria-hidden="true"
         />
         <div className="absolute inset-0 bg-black/40" />
 
-        {/* Center stack with the same vertical rhythm as before.
-            We removed the big logo and keep spacing using a spacer box. */}
+        {/* Center stack */}
         <div className="relative z-10 flex flex-col items-center pt-28 text-center">
-          {/* spacer replacing the removed large logo (keeps exact rhythm) */}
+          {/* spacer to preserve rhythm */}
           <div className="h-[120px] md:h-[140px]" aria-hidden />
 
           <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
@@ -30,28 +46,30 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
-            CINEMATIC STORYTELLING. AI PRECISION. FASTER SALES.
+            America&rsquo;s Premier Land Specialists
           </p>
 
           {/* Categories */}
           <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
-            LAND &nbsp; | &nbsp; RANCH &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
+            LAND &nbsp; | &nbsp; FARM &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
           </div>
 
           {/* CTAs */}
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <a
+            <Link
               href="/properties/available"
               className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
+              aria-label="Browse available properties"
             >
               Buy
-            </a>
-            <a
+            </Link>
+            <Link
               href="/sell"
               className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-sans text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
+              aria-label="List your property with Land Command"
             >
               Sell
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -85,18 +103,20 @@ export default function HomePage() {
               link: "/resources",
             },
           ].map((card, i) => (
-            <a
+            <Link
               key={i}
               href={card.link}
-              className="group overflow-hidden rounded-2xl border border-white/10 bg-black/40 hover:bg-black/55 transition-colors"
+              className="group overflow-hidden rounded-2xl border border-white/10 bg-black/40 transition-colors hover:bg-black/55"
+              aria-label={card.title}
             >
               <div className="relative aspect-[4/3] overflow-hidden">
-                {/* Only the image scales on hover */}
-                <img
+                <Image
                   src={card.src}
                   alt={card.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  priority={i === 0}
                 />
               </div>
               <div className="p-5">
@@ -106,7 +126,7 @@ export default function HomePage() {
                 <h3 className="mt-1 text-xl font-serif font-semibold">{card.title}</h3>
                 <p className="mt-1 text-white/75">{card.meta}</p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -115,21 +135,21 @@ export default function HomePage() {
       <footer className="border-t border-white/10 bg-black/40">
         <div className="mx-auto max-w-6xl px-6 py-10">
           <div className="flex flex-wrap gap-4">
-            <a
+            <Link
               href="/sell"
               className="rounded-xl border border-[rgba(203,178,106,0.6)] bg-[rgba(203,178,106,0.9)] px-6 py-3 font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
             >
               List Your Property
-            </a>
-            <a
+            </Link>
+            <Link
               href="/contact"
               className="rounded-xl border border-white/25 px-6 py-3 text-white hover:bg-white/10"
             >
               Speak with a Specialist
-            </a>
+            </Link>
           </div>
           <p className="mt-4 text-sm text-white/60">
-            © {new Date().getFullYear()} Land Command. All rights reserved.
+            © {year} Land Command. All rights reserved.
           </p>
         </div>
       </footer>
