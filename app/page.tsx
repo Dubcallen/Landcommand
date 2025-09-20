@@ -30,7 +30,7 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
-            America&apos;s Premiere Land Specialists
+            CINEMATIC STORYTELLING. AI PRECISION. FASTER SALES.
           </p>
 
           {/* Categories */}
