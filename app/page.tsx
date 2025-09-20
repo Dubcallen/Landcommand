@@ -8,17 +8,17 @@ export const metadata = {
 
 import Image from "next/image";
 import Link from "next/link";
-import Hero from "./Hero"; // ✅ co-located, case-sensitive
+import Hero from "./Hero"; // co-located Hero component
 
 export default function HomePage() {
   const year = new Date().getFullYear();
 
   return (
     <main className="bg-[#1B1B1B] text-[#EFECE0]">
-      {/* HERO (client component handles 6s rotation) */}
+      {/* HERO (client component handles 6s rotation with crossfade) */}
       <Hero />
 
-      {/* Tiles Section (unchanged) */}
+      {/* Tiles Section */}
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="font-serif text-3xl md:text-4xl">Explore Land Command</h2>
@@ -73,28 +73,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer (unchanged) */}
+      {/* Footer */}
       <footer className="border-t border-white/10 bg-black/40">
         <div className="mx-auto max-w-6xl px-6 py-10">
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/sell"
-              className="rounded-xl border border-[rgba(203,178,106,0.6)] bg-[rgba(203,178,106,0.9)] px-6 py-3 font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
-            >
-              List Your Property
-            </Link>
-            <Link
-              href="/contact"
-              className="rounded-xl border border-white/25 px-6 py-3 text-white hover:bg-white/10"
-            >
-              Speak with a Specialist
-            </Link>
-          </div>
-          <p className="mt-4 text-sm text-white/60">
-            © {year} Land Command. All rights reserved.
-          </p>
-        </div>
-      </footer>
-    </main>
-  );
-}
+          <div className="flex fl
