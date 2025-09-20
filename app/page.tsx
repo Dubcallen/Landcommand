@@ -6,7 +6,7 @@ export const metadata = {
     "Exclusive land, farm, investment, and estate opportunities. List your property, commission short films and stories, and explore financing.",
 };
 
-import * as React from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Hero from "./Hero"; // co-located client component
