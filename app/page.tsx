@@ -8,7 +8,7 @@ export const metadata = {
 
 import Image from "next/image";
 import Link from "next/link";
-import Hero from "./components/Hero";
+import Hero from "../components/Hero"; // ✅ fixed import path
 
 export default function HomePage() {
   const year = new Date().getFullYear();
