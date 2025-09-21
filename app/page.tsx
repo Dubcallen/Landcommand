@@ -1,101 +1,167 @@
-// app/page.tsx
+// app/Hero.tsx
+"use client";
 
-export const metadata = {
-  title: "Land Command — America’s Premier Land Specialists",
-  description:
-    "Exclusive land, farm, investment, and estate opportunities. List your property, commission short films and stories, and explore financing.",
-};
-
-import React from "react";
-import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Hero from "./Hero"; // co-located client component
 
-export default function HomePage() {
-  const year = new Date().getFullYear();
+export default function Hero() {
+  // ⬇️ bump this when you swap hero.mp4 to force fresh fetch
+  const VER = "?v=hero-2025-09-20-3";
+
+  // Playlist & timing
+  const videos = ["/hero.mp4" + VER, "/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
+  const ROTATE_MS = 6000; // rotate every 6s
+  const FADE_MS = 600;    // crossfade duration in ms
+
+  // Two stacked layers for crossfade
+  const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
+  const [srcA, setSrcA] = useState<string>(videos[0]);
+  const [srcB, setSrcB] = useState<string>(videos[1 % videos.length]);
+  const [currentIdx, setCurrentIdx] = useState<number>(0);
+
+  const videoARef = useRef<HTMLVideoElement | null>(null);
+  const videoBRef = useRef<HTMLVideoElement | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Ensure autoplay on all browsers (muted/inline must be set before play)
+  const primeVideo = (el: HTMLVideoElement | null) => {
+    if (!el) return;
+    try {
+      el.muted = true;
+      // @ts-ignore - older Safari
+      (el as any).playsInline = true;
+      el.setAttribute("playsinline", "");
+      const p = el.play();
+      if (p && typeof (p as any).catch === "function") (p as any).catch(() => {});
+    } catch {}
+  };
+
+  useEffect(() => {
+    primeVideo(videoARef.current);
+    primeVideo(videoBRef.current);
+  }, [srcA, srcB, activeLayer]);
+
+  // Crossfade helper
+  const crossfadeTo = (nextIdx: number) => {
+    const incoming = activeLayer === 0 ? 1 : 0;
+
+    if (incoming === 0) {
+      setSrcA(videos[nextIdx]);
+      // ensure src applies before toggling opacity
+      requestAnimationFrame(() => setActiveLayer(0));
+    } else {
+      setSrcB(videos[nextIdx]);
+      requestAnimationFrame(() => setActiveLayer(1));
+    }
+
+    // Pause the non-visible layer after fade completes
+    setTimeout(() => {
+      const outgoingRef = incoming === 0 ? videoBRef.current : videoARef.current;
+      outgoingRef?.pause?.();
+    }, FADE_MS + 20);
+
+    setCurrentIdx(nextIdx);
+  };
+
+  // Interval rotation
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      const nextIdx = (currentIdx + 1) % videos.length;
+      crossfadeTo(nextIdx);
+    }, ROTATE_MS);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIdx, activeLayer]);
+
+  // Also rotate if the currently visible video ends early
+  const handleEnded = (layer: 0 | 1) => {
+    if (layer === activeLayer) {
+      const nextIdx = (currentIdx + 1) % videos.length;
+      crossfadeTo(nextIdx);
+    }
+  };
 
   return (
-    <main className="bg-[#1B1B1B] text-[#EFECE0]">
-      {/* HERO (client component handles 6s rotation with crossfade) */}
-      <Hero />
+    <section className="relative isolate min-h-screen w-full overflow-hidden">
+      {/* Layer A */}
+      <video
+        ref={videoARef}
+        key={`A-${srcA}`}
+        src={srcA}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        loop={false}
+        onEnded={() => handleEnded(0)}
+        poster="/hero_poster.jpg"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ opacity: activeLayer === 0 ? 1 : 0, transition: `opacity ${FADE_MS}ms ease` }}
+        aria-hidden="true"
+      />
 
-      {/* Tiles Section (unchanged) */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="font-serif text-3xl md:text-4xl">Explore Land Command</h2>
+      {/* Layer B */}
+      <video
+        ref={videoBRef}
+        key={`B-${srcB}`}
+        src={srcB}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        loop={false}
+        onEnded={() => handleEnded(1)}
+        poster="/hero_poster.jpg"
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ opacity: activeLayer === 1 ? 1 : 0, transition: `opacity ${FADE_MS}ms ease` }}
+        aria-hidden="true"
+      />
+
+      {/* Soft overlay */}
+      <div className="absolute inset-0 bg-black/40" />
+
+      {/* Center stack (unchanged) */}
+      <div className="relative z-10 flex flex-col items-center pt-28 text-center">
+        {/* spacer to preserve rhythm */}
+        <div className="h-[120px] md:h-[140px]" aria-hidden />
+
+        <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
+          LAND COMMAND
+        </h1>
+
+        {/* Tagline exactly as on your site */}
+        <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
+          CINEMATIC STORYTELLING. AI PRECISION. FASTER SALES.
+        </p>
+
+        {/* Categories — corrected to RANCH */}
+        <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
+          LAND &nbsp; | &nbsp; RANCH &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              src: "/list.jpg",
-              title: "List With Us",
-              meta: "Flat Fee • National Exposure",
-              link: "/sell",
-            },
-            {
-              src: "/films.jpg",
-              title: "Short Films",
-              meta: "Cinematic Reels • 4K Aerial",
-              link: "/short-films",
-            },
-            {
-              src: "/resources.jpg",
-              title: "Resources",
-              meta: "Expertise • Insights • Guidance",
-              link: "/resources",
-            },
-          ].map((card, i) => (
-            <Link
-              key={i}
-              href={card.link}
-              className="group overflow-hidden rounded-2xl border border-white/10 bg-black/40 transition-colors hover:bg-black/55"
-              aria-label={card.title}
-            >
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <Image
-                  src={card.src}
-                  alt={card.title}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  priority={i === 0}
-                />
-              </div>
-              <div className="p-5">
-                <div className="text-xs uppercase tracking-[0.18em] text-white/60">
-                  Exclusive
-                </div>
-                <h3 className="mt-1 text-xl font-serif font-semibold">{card.title}</h3>
-                <p className="mt-1 text-white/75">{card.meta}</p>
-              </div>
-            </Link>
-          ))}
+        {/* CTAs */}
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Link
+            href="/properties/available"
+            className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
+            aria-label="Browse available properties"
+          >
+            Buy
+          </Link>
+          <Link
+            href="/sell"
+            className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-sans text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
+            aria-label="List your property with Land Command"
+          >
+            Sell
+          </Link>
         </div>
-      </section>
+      </div>
 
-      {/* Footer (unchanged) */}
-      <footer className="border-t border-white/10 bg-black/40">
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="/sell"
-              className="rounded-xl border border-[rgba(203,178,106,0.6)] bg-[rgba(203,178,106,0.9)] px-6 py-3 font-medium text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
-            >
-              List Your Property
-            </Link>
-            <Link
-              href="/contact"
-              className="rounded-xl border border-white/25 px-6 py-3 text-white hover:bg-white/10"
-            >
-              Speak with a Specialist
-            </Link>
-          </div>
-          <p className="mt-4 text-sm text-white/60">
-            © {year} Land Command. All rights reserved.
-          </p>
-        </div>
-      </footer>
-    </main>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
+    </section>
   );
 }
+
