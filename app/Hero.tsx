@@ -5,13 +5,10 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function Hero() {
-  // cache-bust hero.mp4 if you swap files
-  const VER = "?v=hero-2025-09-20-3";
-
-  // Playlist & timing
-  const videos = ["/hero.mp4" + VER, "/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
+  // Playlist & timing — loops ONLY hero2/3/4
+  const videos = ["/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
   const ROTATE_MS = 6000; // rotate every 6s
-  const FADE_MS = 600;    // crossfade duration
+  const FADE_MS = 600;    // crossfade duration in ms
 
   // Two stacked layers for crossfade
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
@@ -131,12 +128,12 @@ export default function Hero() {
           LAND COMMAND
         </h1>
 
-        {/* Tagline — updated */}
+        {/* Tagline */}
         <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
           Cinematic Storytelling. AI Precision. Take Command.
         </p>
 
-        {/* Categories — stays RANCH */}
+        {/* Categories — RANCH */}
         <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
           LAND &nbsp; | &nbsp; RANCH &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
         </div>
