@@ -5,23 +5,24 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function Hero() {
-  // Playlist & timing — ONLY hero2/3/4
-  const V = "?v=lc-1"; // cache-buster (optional)
-  const videos = ["/hero2.mp4" + V, "/hero3.mp4" + V, "/hero4.mp4" + V];
-  const ROTATE_MS = 6000; // rotate every 6s
-  const FADE_MS = 600;    // crossfade duration in ms
+  // Only loop hero2/hero3/hero4
+  const videos = ["/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
+  const ROTATE_MS = 6000; // 6s per clip
+  const FADE_MS = 600;    // crossfade duration
 
-  // Two stacked layers for crossfade
+  // Crossfade state
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
+  const [currentIdx, setCurrentIdx] = useState<number>(0);
   const [srcA, setSrcA] = useState<string>(videos[0]);
   const [srcB, setSrcB] = useState<string>(videos[1 % videos.length]);
-  const [currentIdx, setCurrentIdx] = useState<number>(0);
 
+  // Refs
   const videoARef = useRef<HTMLVideoElement | null>(null);
   const videoBRef = useRef<HTMLVideoElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const primeVideo = (el: HTMLVideoElement | null) => {
+  // Ensure autoplay (mobile)
+  const prime = (el: HTMLVideoElement | null) => {
     if (!el) return;
     try {
       el.muted = true;
@@ -34,13 +35,13 @@ export default function Hero() {
   };
 
   useEffect(() => {
-    primeVideo(videoARef.current);
-    primeVideo(videoBRef.current);
+    prime(videoARef.current);
+    prime(videoBRef.current);
   }, [srcA, srcB, activeLayer]);
 
-  // Crossfade helper
+  // Crossfade to next index
   const crossfadeTo = (nextIdx: number) => {
-    const incoming = activeLayer === 0 ? 1 : 0;
+    const incoming: 0 | 1 = activeLayer === 0 ? 1 : 0;
 
     if (incoming === 0) {
       setSrcA(videos[nextIdx]);
@@ -50,10 +51,11 @@ export default function Hero() {
       requestAnimationFrame(() => setActiveLayer(1));
     }
 
+    // Pause the outgoing layer after fade
     setTimeout(() => {
       const outgoingRef = incoming === 0 ? videoBRef.current : videoARef.current;
       outgoingRef?.pause?.();
-    }, FADE_MS + 20);
+    }, FADE_MS + 30);
 
     setCurrentIdx(nextIdx);
   };
@@ -70,7 +72,7 @@ export default function Hero() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIdx, activeLayer]);
 
-  // Also rotate if the currently visible video ends early
+  // Safety: if a clip ends early, advance
   const handleEnded = (layer: 0 | 1) => {
     if (layer === activeLayer) {
       const nextIdx = (currentIdx + 1) % videos.length;
@@ -129,9 +131,29 @@ export default function Hero() {
           Cinematic Storytelling. AI Precision. Take Command.
         </p>
 
-        {/* Categories — RANCH */}
         <div className="mt-6 inline-flex items-center rounded-full border border-white/20 bg-black/30 px-5 py-2 text-sm uppercase tracking-[0.18em] text-white/85 backdrop-blur">
           LAND &nbsp; | &nbsp; RANCH &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
         </div>
 
-        {/* CTAs*
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Link
+            href="/properties/available"
+            className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
+            aria-label="Browse available properties"
+          >
+            Buy
+          </Link>
+          <Link
+            href="/sell"
+            className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-sans text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
+            aria-label="List your property with Land Command"
+          >
+            Sell
+          </Link>
+        </div>
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
+    </section>
+  );
+}
