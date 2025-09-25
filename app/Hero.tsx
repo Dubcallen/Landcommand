@@ -5,13 +5,13 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function Hero() {
-  // ⬇️ bump this when you swap hero.mp4 to force fresh fetch (optional)
+  // cache-bust hero.mp4 if you swap files
   const VER = "?v=hero-2025-09-20-3";
 
   // Playlist & timing
   const videos = ["/hero.mp4" + VER, "/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
   const ROTATE_MS = 6000; // rotate every 6s
-  const FADE_MS = 600;    // crossfade duration in ms
+  const FADE_MS = 600;    // crossfade duration
 
   // Two stacked layers for crossfade
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
@@ -133,7 +133,7 @@ export default function Hero() {
 
         {/* Tagline — updated */}
         <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
-          CINEMATIC STORYTELLING. AI PRECISION. TAKE COMMAND.
+          Cinematic Storytelling. AI Precision. Take Command.
         </p>
 
         {/* Categories — stays RANCH */}
@@ -164,3 +164,4 @@ export default function Hero() {
     </section>
   );
 }
+
