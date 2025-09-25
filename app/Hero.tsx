@@ -5,8 +5,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function Hero() {
-  // Playlist & timing — loops ONLY hero2/3/4
-  const videos = ["/hero2.mp4", "/hero3.mp4", "/hero4.mp4"];
+  // Playlist & timing — ONLY hero2/3/4
+  const V = "?v=lc-1"; // cache-buster (optional)
+  const videos = ["/hero2.mp4" + V, "/hero3.mp4" + V, "/hero4.mp4" + V];
   const ROTATE_MS = 6000; // rotate every 6s
   const FADE_MS = 600;    // crossfade duration in ms
 
@@ -20,13 +21,12 @@ export default function Hero() {
   const videoBRef = useRef<HTMLVideoElement | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Ensure autoplay on all browsers (muted/inline must be set before play)
   const primeVideo = (el: HTMLVideoElement | null) => {
     if (!el) return;
     try {
       el.muted = true;
-      // @ts-ignore - older Safari
-      (el as any).playsInline = true;
+      // @ts-ignore
+      el.playsInline = true;
       el.setAttribute("playsinline", "");
       const p = el.play();
       if (p && typeof (p as any).catch === "function") (p as any).catch(() => {});
@@ -44,14 +44,12 @@ export default function Hero() {
 
     if (incoming === 0) {
       setSrcA(videos[nextIdx]);
-      // ensure src applies before toggling opacity
       requestAnimationFrame(() => setActiveLayer(0));
     } else {
       setSrcB(videos[nextIdx]);
       requestAnimationFrame(() => setActiveLayer(1));
     }
 
-    // Pause the non-visible layer after fade completes
     setTimeout(() => {
       const outgoingRef = incoming === 0 ? videoBRef.current : videoARef.current;
       outgoingRef?.pause?.();
@@ -121,14 +119,12 @@ export default function Hero() {
 
       {/* Center stack */}
       <div className="relative z-10 flex flex-col items-center pt-28 text-center">
-        {/* spacer to preserve rhythm */}
         <div className="h-[120px] md:h-[140px]" aria-hidden />
 
         <h1 className="font-serif text-5xl md:text-6xl tracking-[0.04em]">
           LAND COMMAND
         </h1>
 
-        {/* Tagline */}
         <p className="mt-3 text-lg md:text-xl font-serif text-white/90 uppercase tracking-wide">
           Cinematic Storytelling. AI Precision. Take Command.
         </p>
@@ -138,27 +134,4 @@ export default function Hero() {
           LAND &nbsp; | &nbsp; RANCH &nbsp; | &nbsp; INVESTMENT &nbsp; | &nbsp; ESTATE
         </div>
 
-        {/* CTAs */}
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <Link
-            href="/properties/available"
-            className="rounded-xl border border-white/40 px-6 py-3 text-sm font-sans text-white hover:bg-white/10"
-            aria-label="Browse available properties"
-          >
-            Buy
-          </Link>
-          <Link
-            href="/sell"
-            className="rounded-xl border border-[rgba(203,178,106,0.75)] bg-[rgba(203,178,106,0.9)] px-6 py-3 text-sm font-sans text-[#1B1B1B] hover:bg-[rgba(203,178,106,1)]"
-            aria-label="List your property with Land Command"
-          >
-            Sell
-          </Link>
-        </div>
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#1B1B1B]" />
-    </section>
-  );
-}
-
+        {/* CTAs*
